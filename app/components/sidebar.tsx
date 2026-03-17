@@ -234,11 +234,9 @@ export function SideBar(props: { className?: string }) {
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
   useEffect(() => {
-    // 检查 MCP 是否启用
     const checkMcpStatus = async () => {
       const enabled = await isMcpEnabled();
       setMcpEnabled(enabled);
-      console.log("[SideBar] MCP enabled:", enabled);
     };
     checkMcpStatus();
   }, []);
@@ -250,61 +248,30 @@ export function SideBar(props: { className?: string }) {
       {...props}
     >
       <SideBarHeader
-        title="NextChat"
-        subTitle="Build your own AI assistant."
+        title="AI 控制面板"
+        subTitle="软硬一体化演示系统"
         logo={<ChatGptIcon />}
         shouldNarrow={shouldNarrow}
       >
+        {/* 顶部仅保留基础功能按钮，保持简洁 */}
         <div className={styles["sidebar-header-bar"]}>
           <IconButton
             icon={<MaskIcon />}
             text={shouldNarrow ? undefined : Locale.Mask.Name}
             className={styles["sidebar-bar-button"]}
-            onClick={() => {
-              if (config.dontShowMaskSplashScreen !== true) {
-                navigate(Path.NewChat, { state: { fromHome: true } });
-              } else {
-                navigate(Path.Masks, { state: { fromHome: true } });
-              }
-            }}
+            onClick={() => navigate(Path.Masks)}
             shadow
           />
-          {mcpEnabled && (
-            <IconButton
-              icon={<McpIcon />}
-              text={shouldNarrow ? undefined : Locale.Mcp.Name}
-              className={styles["sidebar-bar-button"]}
-              onClick={() => {
-                navigate(Path.McpMarket, { state: { fromHome: true } });
-              }}
-              shadow
-            />
-          )}
           <IconButton
-            icon={<DiscoveryIcon />}
-            text={shouldNarrow ? undefined : Locale.Discovery.Name}
+            icon={<SettingsIcon />}
+            text={shouldNarrow ? undefined : "设置"}
             className={styles["sidebar-bar-button"]}
-            onClick={() => setshowDiscoverySelector(true)}
+            onClick={() => navigate(Path.Settings)}
             shadow
           />
         </div>
-        {showDiscoverySelector && (
-          <Selector
-            items={[
-              ...DISCOVERY.map((item) => {
-                return {
-                  title: item.name,
-                  value: item.path,
-                };
-              }),
-            ]}
-            onClose={() => setshowDiscoverySelector(false)}
-            onSelection={(s) => {
-              navigate(s[0], { state: { fromHome: true } });
-            }}
-          />
-        )}
       </SideBarHeader>
+
       <SideBarBody
         onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -312,37 +279,58 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
+        {/* --- 新增：演示功能长条按钮组 --- */}
+        <div className={styles["sidebar-actions"]} style={{ padding: "10px 20px", gap: "8px", display: "flex", flexDirection: "column" }}>
+          <IconButton
+            icon={<DiscoveryIcon />}
+            text={shouldNarrow ? undefined : "产品主页"}
+            onClick={() => navigate(Path.ProductHome)}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
+          <IconButton
+            icon={<ChatGptIcon />}
+            text={shouldNarrow ? undefined : "模型状态"}
+            onClick={() => navigate(Path.ModelStatus)}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
+          <IconButton
+            icon={<McpIcon />}
+            text={shouldNarrow ? undefined : "推理服务"}
+            onClick={() => navigate(Path.Inference)}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
+          <IconButton
+            icon={<AddIcon />}
+            text={shouldNarrow ? undefined : "资源监控"}
+            onClick={() => navigate(Path.Monitor)}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
+          <IconButton
+            icon={<DragIcon />}
+            text={shouldNarrow ? undefined : "样机展示"}
+            onClick={() => navigate(Path.Showcase)}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
+        </div>
+
+        {/* 分割线 */}
+        <div style={{ height: "1px", background: "var(--border-in-light)", margin: "10px 20px", opacity: 0.5 }} />
+
+        {/* 聊天列表区 */}
         <ChatList narrow={shouldNarrow} />
       </SideBarBody>
+
       <SideBarTail
         primaryAction={
           <>
-            <div className={clsx(styles["sidebar-action"], styles.mobile)}>
-              <IconButton
-                icon={<DeleteIcon />}
-                onClick={async () => {
-                  if (await showConfirm(Locale.Home.DeleteChat)) {
-                    chatStore.deleteSession(chatStore.currentSessionIndex);
-                  }
-                }}
-              />
-            </div>
-            <div className={styles["sidebar-action"]}>
-              <Link to={Path.Settings}>
-                <IconButton
-                  aria={Locale.Settings.Title}
-                  icon={<SettingsIcon />}
-                  shadow
-                />
-              </Link>
-            </div>
             <div className={styles["sidebar-action"]}>
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-                <IconButton
-                  aria={Locale.Export.MessageFromChatGPT}
-                  icon={<GithubIcon />}
-                  shadow
-                />
+                <IconButton icon={<GithubIcon />} shadow />
               </a>
             </div>
           </>
@@ -350,14 +338,10 @@ export function SideBar(props: { className?: string }) {
         secondaryAction={
           <IconButton
             icon={<AddIcon />}
-            text={shouldNarrow ? undefined : Locale.Home.NewChat}
+            text={shouldNarrow ? undefined : "新建对话"}
             onClick={() => {
-              if (config.dontShowMaskSplashScreen) {
-                chatStore.newSession();
-                navigate(Path.Chat);
-              } else {
-                navigate(Path.NewChat);
-              }
+              chatStore.newSession();
+              navigate(Path.Chat);
             }}
             shadow
           />

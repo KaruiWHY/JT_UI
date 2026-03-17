@@ -2,6 +2,10 @@
 
 require("../polyfill");
 
+import { ProductHomePage } from "./product-home";
+
+import { MonitorPage } from "./monitor";
+
 import { useEffect, useState } from "react";
 import styles from "./home.module.scss";
 
@@ -181,6 +185,7 @@ function Screen() {
       </Routes>
     );
   }
+
   const renderContent = () => {
     if (isAuth) return <AuthPage />;
     if (isSd) return <Sd />;
@@ -202,6 +207,13 @@ function Screen() {
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
+
+            {/* --- 新增演示流程路由 --- */}
+            <Route path={Path.Monitor} element={<MonitorPage />} />
+            <Route path={Path.ProductHome} element={<ProductHomePage />} />
+            <Route path={Path.ModelStatus} element={<div className="p-10 text-2xl">模型状态管理建设中...</div>} />
+            <Route path={Path.Inference} element={<Chat />} /> {/* 推理直接复用 Chat 组件 */}
+            <Route path={Path.Showcase} element={<div className="p-10 text-2xl">样机形态展示建设中...</div>} />
           </Routes>
         </WindowContent>
       </>
