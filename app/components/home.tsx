@@ -2,6 +2,10 @@
 
 require("../polyfill");
 
+import { ModelStatusPage } from "./model-status";
+
+import { ShowcasePage } from "./showcase";
+
 import { ProductHomePage } from "./product-home";
 
 import { MonitorPage } from "./monitor";
@@ -211,9 +215,9 @@ function Screen() {
             {/* --- 新增演示流程路由 --- */}
             <Route path={Path.Monitor} element={<MonitorPage />} />
             <Route path={Path.ProductHome} element={<ProductHomePage />} />
-            <Route path={Path.ModelStatus} element={<div className="p-10 text-2xl">模型状态管理建设中...</div>} />
+            <Route path={Path.ModelStatus} element={<ModelStatusPage />} />
             <Route path={Path.Inference} element={<Chat />} /> {/* 推理直接复用 Chat 组件 */}
-            <Route path={Path.Showcase} element={<div className="p-10 text-2xl">样机形态展示建设中...</div>} />
+            <Route path={Path.Showcase} element={<ShowcasePage />} />
           </Routes>
         </WindowContent>
       </>
