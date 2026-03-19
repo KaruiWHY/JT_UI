@@ -7,8 +7,6 @@ import SettingsIcon from "../icons/settings.svg";
 import GithubIcon from "../icons/github.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
-import DeleteIcon from "../icons/delete.svg";
-import MaskIcon from "../icons/mask.svg";
 import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
@@ -26,10 +24,9 @@ import {
   REPO_URL,
 } from "../constant";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 
@@ -248,20 +245,20 @@ export function SideBar(props: { className?: string }) {
       {...props}
     >
       <SideBarHeader
-        title="AI 控制面板"
-        subTitle="软硬一体化演示系统"
+        title="普惠 AI 一体机"
+        subTitle="控制系统"
         logo={<ChatGptIcon />}
         shouldNarrow={shouldNarrow}
       >
         {/* 顶部仅保留基础功能按钮，保持简洁 */}
         <div className={styles["sidebar-header-bar"]}>
-          <IconButton
+          {/* <IconButton
             icon={<MaskIcon />}
             text={shouldNarrow ? undefined : Locale.Mask.Name}
             className={styles["sidebar-bar-button"]}
             onClick={() => navigate(Path.Masks)}
-            shadow
-          />
+            shadow  
+          /> */}
           <IconButton
             icon={<SettingsIcon />}
             text={shouldNarrow ? undefined : "设置"}
@@ -280,7 +277,15 @@ export function SideBar(props: { className?: string }) {
         }}
       >
         {/* --- 新增：演示功能长条按钮组 --- */}
-        <div className={styles["sidebar-actions"]} style={{ padding: "10px 20px", gap: "8px", display: "flex", flexDirection: "column" }}>
+        <div
+          className={styles["sidebar-actions"]}
+          style={{
+            padding: "10px 20px",
+            gap: "8px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <IconButton
             icon={<DiscoveryIcon />}
             text={shouldNarrow ? undefined : "产品主页"}
@@ -319,7 +324,14 @@ export function SideBar(props: { className?: string }) {
         </div>
 
         {/* 分割线 */}
-        <div style={{ height: "1px", background: "var(--border-in-light)", margin: "10px 20px", opacity: 0.5 }} />
+        <div
+          style={{
+            height: "1px",
+            background: "var(--border-in-light)",
+            margin: "10px 20px",
+            opacity: 0.5,
+          }}
+        />
 
         {/* 聊天列表区 */}
         <ChatList narrow={shouldNarrow} />
