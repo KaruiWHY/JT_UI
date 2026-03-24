@@ -293,13 +293,13 @@ export function SideBar(props: { className?: string }) {
             className={styles["sidebar-bar-button"]}
             shadow
           />
-          <IconButton
+          {/* <IconButton
             icon={<ChatGptIcon />}
             text={shouldNarrow ? undefined : "模型状态"}
             onClick={() => navigate(Path.ModelStatus)}
             className={styles["sidebar-bar-button"]}
             shadow
-          />
+          /> */}
           <IconButton
             icon={<McpIcon />}
             text={shouldNarrow ? undefined : "推理服务"}
@@ -309,11 +309,11 @@ export function SideBar(props: { className?: string }) {
           />
           <IconButton
             icon={<AddIcon />}
-            text={shouldNarrow ? undefined : "资源监控"}
-            onClick={() => navigate(Path.Monitor)}
+            text={shouldNarrow ? undefined : "模型监控"}
+            onClick={() => navigate(Path.Dashboard)}
             className={styles["sidebar-bar-button"]}
             shadow
-          />
+          /> 
           <IconButton
             icon={<DragIcon />}
             text={shouldNarrow ? undefined : "样机展示"}

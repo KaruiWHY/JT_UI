@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 export function MonitorPage() {
   // 【重要】请在此处填入你服务器的真实局域网 IP
-  const SERVER_IP = "192.168.1.37";
+  const SERVER_IP = "192.168.1.93";
   const SERVER_PORT = "3001";
 
   const [stats, setStats] = useState({

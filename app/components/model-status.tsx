@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 export function ModelStatusPage() {
   // 【重要】请修改为你服务器的真实 IP
-  const SERVER_IP = "192.168.1.37";
+  const SERVER_IP = "192.168.1.93";
   const SERVER_PORT = "3001";
 
   const [realData, setRealData] = useState({

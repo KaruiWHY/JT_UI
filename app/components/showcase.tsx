@@ -66,9 +66,9 @@ export function ShowcasePage() {
             <h3 style={{ fontSize: '18px', fontWeight: '850', marginBottom: '20px', color: '#2563eb' }}>标准性能口径 (典型值)</h3>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <SpecItem label="支持模型" value="671B–685B 级 FP8 MoE" />
-              <SpecItem label="首 Token 延迟" value="0.9 – 1.2 s (短输入)" />
-              <SpecItem label="单会话吞吐" value="7 – 10 token/s" />
-              <SpecItem label="总输出吞吐" value="12 – 15 token/s" />
+              <SpecItem label="首 Token 延迟(TTFT)" value="0.7 – 1.0 s " />
+              <SpecItem label="单会话吞吐" value="7 – 12 token/s" />
+              <SpecItem label="总吞吐" value="20 – 30 token/s" />
               <SpecItem label="推荐服务并发" value="4 – 8 路" />
               <SpecItem label="批量预填充能力" value="> 1000 token/s" />
             </div>
@@ -88,7 +88,7 @@ export function ShowcasePage() {
           
           {/* 跳转按钮 */}
           <button 
-            onClick={() => navigate(Path.Monitor)}
+            onClick={() => navigate(Path.Dashboard)}
             style={{ 
               width: '100%', 
               padding: '16px', 

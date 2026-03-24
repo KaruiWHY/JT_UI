@@ -11,7 +11,7 @@ export const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 
 export const STABILITY_BASE_URL = "https://api.stability.ai";
 
-export const OPENAI_BASE_URL = "http://192.168.1.37:31000/";
+export const OPENAI_BASE_URL = "http://192.168.1.93:30000/";
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
@@ -50,9 +50,10 @@ export enum Path {
   Plugins = "/plugins",
   Auth = "/auth",
   ProductHome = "/product-home",
-  ModelStatus = "/model-status",
+  //ModelStatus = "/model-status",
   Inference = "/inference",
-  Monitor = "/monitor",
+  Dashboard = "/dashboard",
+  //Monitor = "/monitor",
   Showcase = "/showcase",
   Sd = "/sd",
   SdNew = "/sd-new",

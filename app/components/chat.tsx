@@ -188,18 +188,18 @@ export function SessionConfigModel(props: { onClose: () => void }) {
               }
             }}
           />,
-          <IconButton
-            key="copy"
-            icon={<CopyIcon />}
-            bordered
-            text={Locale.Chat.Config.SaveAs}
-            onClick={() => {
-              navigate(Path.Masks);
-              setTimeout(() => {
-                maskStore.create(session.mask);
-              }, 500);
-            }}
-          />,
+          // <IconButton
+          //   key="copy"
+          //   icon={<CopyIcon />}
+          //   bordered
+          //   text={Locale.Chat.Config.SaveAs}
+          //   onClick={() => {
+          //     navigate(Path.Masks);
+          //     setTimeout(() => {
+          //       maskStore.create(session.mask);
+          //     }, 500);
+          //   }}
+          // />,
         ]}
       >
         <MaskConfig
@@ -650,13 +650,13 @@ export function ChatActions(props: {
           icon={<PromptIcon />}
         />
 
-        <ChatAction
+        {/* <ChatAction
           onClick={() => {
             navigate(Path.Masks);
           }}
           text={Locale.Chat.InputActions.Masks}
           icon={<MaskIcon />}
-        />
+        /> */}
 
         <ChatAction
           text={Locale.Chat.InputActions.Clear}
@@ -673,11 +673,11 @@ export function ChatActions(props: {
           }}
         />
 
-        <ChatAction
+        {/* <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
           icon={<RobotIcon />}
-        />
+        /> */}
 
         {showModelSelector && (
           <Selector

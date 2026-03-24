@@ -139,7 +139,7 @@ export function MaskConfig(props: {
             </div>
           </Popover>
         </ListItem>
-        <ListItem title={Locale.Mask.Config.Name}>
+        {/* <ListItem title={Locale.Mask.Config.Name}>
           <input
             aria-label={Locale.Mask.Config.Name}
             type="text"
@@ -200,9 +200,9 @@ export function MaskConfig(props: {
               }}
             ></input>
           </ListItem>
-        )}
+        )} */}
 
-        {!props.shouldSyncFromGlobal ? (
+        {/* {!props.shouldSyncFromGlobal ? (
           <ListItem
             title={Locale.Mask.Config.Share.Title}
             subTitle={Locale.Mask.Config.Share.SubTitle}
@@ -214,9 +214,9 @@ export function MaskConfig(props: {
               onClick={copyMaskLink}
             />
           </ListItem>
-        ) : null}
+        ) : null} */}
 
-        {props.shouldSyncFromGlobal ? (
+        {/* {props.shouldSyncFromGlobal ? (
           <ListItem
             title={Locale.Mask.Config.Sync.Title}
             subTitle={Locale.Mask.Config.Sync.SubTitle}
@@ -243,7 +243,7 @@ export function MaskConfig(props: {
               }}
             ></input>
           </ListItem>
-        ) : null}
+        ) : null} */}
       </List>
 
       <List>
@@ -654,26 +654,26 @@ export function MaskPage() {
                   )
                 }
               />,
-              <IconButton
-                key="copy"
-                icon={<CopyIcon />}
-                bordered
-                text={Locale.Mask.EditModal.Clone}
-                onClick={() => {
-                  navigate(Path.Masks);
-                  maskStore.create(editingMask);
-                  setEditingMaskId(undefined);
-                }}
-              />,
+              // <IconButton
+              //   key="copy"
+              //   icon={<CopyIcon />}
+              //   bordered
+              //   text={Locale.Mask.EditModal.Clone}
+              //   onClick={() => {
+              //     navigate(Path.Masks);
+              //     maskStore.create(editingMask);
+              //     setEditingMaskId(undefined);
+              //   }}
+              // />,
             ]}
           >
-            <MaskConfig
+            {/* <MaskConfig
               mask={editingMask}
               updateMask={(updater) =>
                 maskStore.updateMask(editingMaskId!, updater)
               }
               readonly={editingMask.builtin}
-            />
+            /> */}
           </Modal>
         </div>
       )}

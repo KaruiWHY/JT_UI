@@ -148,20 +148,25 @@
 .sidebar-logo {
   display: inline-flex;
 }
-
+  
 .sidebar-title-container {
   display: inline-flex;
   flex-direction: column;
-}
+} 
 
 .sidebar-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 1px;
   animation: slide-in ease 0.3s;
-}
+} 
 
 .sidebar-sub-title {
-  font-size: 12px;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text-secondary); 
+  margin-top: 4px;
   font-weight: 400;
   animation: slide-in ease 0.3s;
 }

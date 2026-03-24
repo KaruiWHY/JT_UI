@@ -2,13 +2,15 @@
 
 require("../polyfill");
 
-import { ModelStatusPage } from "./model-status";
+//import { ModelStatusPage } from "./model-status";
 
 import { ShowcasePage } from "./showcase";
 
 import { ProductHomePage } from "./product-home";
 
-import { MonitorPage } from "./monitor";
+import { CombinedStatusPage } from "./combined-status";
+
+//import { MonitorPage } from "./monitor";
 
 import { useEffect, useState } from "react";
 import styles from "./home.module.scss";
@@ -213,9 +215,10 @@ function Screen() {
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
 
             {/* --- 新增演示流程路由 --- */}
-            <Route path={Path.Monitor} element={<MonitorPage />} />
+            {/* <Route path={Path.Monitor} element={<MonitorPage />} /> */}
             <Route path={Path.ProductHome} element={<ProductHomePage />} />
-            <Route path={Path.ModelStatus} element={<ModelStatusPage />} />
+            {/* <Route path={Path.ModelStatus} element={<ModelStatusPage />} /> */}
+            <Route path={Path.Dashboard} element={<CombinedStatusPage />} />
             <Route path={Path.Inference} element={<Chat />} /> {/* 推理直接复用 Chat 组件 */}
             <Route path={Path.Showcase} element={<ShowcasePage />} />
           </Routes>
