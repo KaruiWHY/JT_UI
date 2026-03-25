@@ -64,7 +64,7 @@ export const DEFAULT_CONFIG = {
   models: DEFAULT_MODELS as any as LLMModel[],
 
   modelConfig: {
-    model: "gpt-4o-mini" as ModelType,
+    model: "Minimax-M2.5" as ModelType,
     providerName: "OpenAI" as ServiceProvider,
     temperature: 0.5,
     top_p: 1,
@@ -104,6 +104,14 @@ export const DEFAULT_CONFIG = {
     temperature: 0.9,
     voice: "alloy" as Voice,
   },
+
+  grafanaConfig: {
+    url: "http://192.168.1.93:3000/",
+  },
+
+  openclawConfig: {
+    url: "http://localhost:18789/openclaw/",
+  },
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
@@ -111,6 +119,8 @@ export type ChatConfig = typeof DEFAULT_CONFIG;
 export type ModelConfig = ChatConfig["modelConfig"];
 export type TTSConfig = ChatConfig["ttsConfig"];
 export type RealtimeConfig = ChatConfig["realtimeConfig"];
+export type GrafanaConfig = ChatConfig["grafanaConfig"];
+export type OpenclawConfig = ChatConfig["openclawConfig"];
 
 export function limitNumber(
   x: number,
@@ -195,7 +205,7 @@ export const useAppConfig = createPersistStore(
   }),
   {
     name: StoreKey.Config,
-    version: 4.1,
+    version: 4.3,
 
     merge(persistedState, currentState) {
       const state = persistedState as ChatConfig | undefined;
@@ -253,6 +263,14 @@ export const useAppConfig = createPersistStore(
           DEFAULT_CONFIG.modelConfig.compressModel;
         state.modelConfig.compressProviderName =
           DEFAULT_CONFIG.modelConfig.compressProviderName;
+      }
+
+      if (version < 4.2) {
+        state.grafanaConfig = { ...DEFAULT_CONFIG.grafanaConfig };
+      }
+
+      if (version < 4.3) {
+        state.openclawConfig = { ...DEFAULT_CONFIG.openclawConfig };
       }
 
       return state as any;

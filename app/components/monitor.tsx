@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
+import { ACCESS_CODE_PREFIX } from "@/app/constant";
+import { useAccessStore } from "@/app/store";
 
 // --- 普惠满血推理一体机：远程资源监控页 (含温度显示版) ---
 
 export function MonitorPage() {
-  // 【重要】请在此处填入你服务器的真实局域网 IP
-  const SERVER_IP = "192.168.1.93";
-  const SERVER_PORT = "3001";
+  const accessStore = useAccessStore();
 
   const [stats, setStats] = useState({
     cpu: 0,
@@ -22,19 +22,26 @@ export function MonitorPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `http://${SERVER_IP}:${SERVER_PORT}/api/hardware`,
-        );
+        const headers: Record<string, string> = {};
+        if (accessStore.accessCode) {
+          headers.Authorization = `Bearer ${ACCESS_CODE_PREFIX}${accessStore.accessCode}`;
+        }
+
+        const response = await fetch("/api/service/sglang/hardware", {
+          headers,
+          cache: "no-store",
+        });
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
+        const metrics = data?.data ?? data;
 
         setStats((prev) => ({
-          cpu: Math.round(prev.cpu * (1 - EMA_COEFF) + data.cpu * EMA_COEFF),
-          gpu: Math.round(prev.gpu * (1 - EMA_COEFF) + data.gpu * EMA_COEFF),
-          ram: data.ram,
-          ramTotal: data.ramTotal || 1228,
-          vram: data.vram,
-          temp: data.temp || 0, // 接收温度数据
+          cpu: Math.round(prev.cpu * (1 - EMA_COEFF) + (metrics.cpu || 0) * EMA_COEFF),
+          gpu: Math.round(prev.gpu * (1 - EMA_COEFF) + (metrics.gpu || 0) * EMA_COEFF),
+          ram: metrics.ram || 0,
+          ramTotal: metrics.ramTotal || 1228,
+          vram: metrics.vram || 0,
+          temp: metrics.temp || 0,
           isConnected: true,
         }));
       } catch (e) {
@@ -44,7 +51,7 @@ export function MonitorPage() {
 
     const timer = setInterval(fetchData, 1500);
     return () => clearInterval(timer);
-  }, [SERVER_IP]);
+  }, [accessStore.accessCode]);
 
   return (
     <div

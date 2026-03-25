@@ -96,6 +96,10 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      ENABLE_SGLANG_CONTROL?: string;
+      SGLANG_CONTROL_URL?: string;
+      SGLANG_CONTROL_TOKEN?: string;
     }
   }
 }
@@ -274,5 +278,8 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    enableSglangControl: process.env.ENABLE_SGLANG_CONTROL === "true",
+    sglangControlUrl: process.env.SGLANG_CONTROL_URL,
+    sglangControlToken: process.env.SGLANG_CONTROL_TOKEN,
   };
 };

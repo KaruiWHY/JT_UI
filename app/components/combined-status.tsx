@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
+import { ACCESS_CODE_PREFIX } from "@/app/constant";
+import { useAccessStore } from "@/app/store";
 
 // =========================================
 // 大模型推理一体机综合看板 (极致紧凑一屏版)
 // =========================================
 
 export function CombinedStatusPage() {
-  // 【重要】请修改为你服务器的真实 IP
-  const SERVER_IP = "192.168.1.93"; 
-  const SERVER_PORT = "3001";
+  const accessStore = useAccessStore();
 
   const [stats, setStats] = useState({
     cpu: 0, gpu: 0, vram: 0, ram: 0, ramTotal: 1228, temp: 0, isConnected: false
@@ -17,17 +17,26 @@ export function CombinedStatusPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://${SERVER_IP}:${SERVER_PORT}/api/hardware`);
+        const headers: Record<string, string> = {};
+        if (accessStore.accessCode) {
+          headers.Authorization = `Bearer ${ACCESS_CODE_PREFIX}${accessStore.accessCode}`;
+        }
+
+        const response = await fetch("/api/service/sglang/hardware", {
+          headers,
+          cache: "no-store",
+        });
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
+        const metrics = data?.data ?? data;
 
         setStats(prev => ({
-          cpu: Math.round(prev.cpu * (1 - EMA_COEFF) + data.cpu * EMA_COEFF),
-          gpu: Math.round(prev.gpu * (1 - EMA_COEFF) + data.gpu * EMA_COEFF),
-          ram: data.ram,
-          ramTotal: data.ramTotal || 1228,
-          vram: data.vram,
-          temp: data.temp || 0,
+          cpu: Math.round(prev.cpu * (1 - EMA_COEFF) + (metrics.cpu || 0) * EMA_COEFF),
+          gpu: Math.round(prev.gpu * (1 - EMA_COEFF) + (metrics.gpu || 0) * EMA_COEFF),
+          ram: metrics.ram || 0,
+          ramTotal: metrics.ramTotal || 1228,
+          vram: metrics.vram || 0,
+          temp: metrics.temp || 0,
           isConnected: true
         }));
       } catch (e) {
@@ -38,7 +47,7 @@ export function CombinedStatusPage() {
     // 为保证丝滑，维持较高刷新率
     const timer = setInterval(fetchData, 1500);
     return () => clearInterval(timer);
-  }, []);
+  }, [accessStore.accessCode]);
 
   // 极致压缩的全局容器：使用 overflow: hidden 强制不滚动
   const containerStyle = {

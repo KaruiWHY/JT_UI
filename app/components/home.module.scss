@@ -150,8 +150,33 @@
 }
   
 .sidebar-title-container {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
+  justify-content: center;
+  min-height: 56px;
+  overflow: hidden;
+}
+
+.sidebar-title-content {
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar-title-watermark {
+  position: absolute;
+  left: 0;
+  top: 54%;
+  transform: translateY(-50%);
+  z-index: 1;
+  opacity: 1;
+  pointer-events: none;
+
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
 } 
 
 .sidebar-title {

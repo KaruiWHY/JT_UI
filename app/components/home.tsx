@@ -9,6 +9,7 @@ import { ShowcasePage } from "./showcase";
 import { ProductHomePage } from "./product-home";
 
 import { CombinedStatusPage } from "./combined-status";
+import { GrafanaPage } from "./grafana";
 
 //import { MonitorPage } from "./monitor";
 
@@ -219,6 +220,7 @@ function Screen() {
             <Route path={Path.ProductHome} element={<ProductHomePage />} />
             {/* <Route path={Path.ModelStatus} element={<ModelStatusPage />} /> */}
             <Route path={Path.Dashboard} element={<CombinedStatusPage />} />
+            <Route path={Path.Grafana} element={<GrafanaPage />} />
             <Route path={Path.Inference} element={<Chat />} /> {/* 推理直接复用 Chat 组件 */}
             <Route path={Path.Showcase} element={<ShowcasePage />} />
           </Routes>
