@@ -7,6 +7,7 @@ export interface MonitorStats {
   vram: number;
   ram: number;
   ramTotal: number;
+  cpuTemp: number;
   temp: number;
   isConnected: boolean;
 }
@@ -20,7 +21,14 @@ export const useMonitorStore = create<MonitorStore>()(
   persist(
     (set) => ({
       stats: {
-        cpu: 0, gpu: 0, vram: 0, ram: 0, ramTotal: 1228, temp: 0, isConnected: false,
+        cpu: 0,
+        gpu: 0,
+        vram: 0,
+        ram: 0,
+        ramTotal: 1228,
+        temp: 0,
+        cpuTemp: 0,
+        isConnected: false,
       },
       updateStats: (newStats) =>
         set((state) => ({

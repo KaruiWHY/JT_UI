@@ -36,7 +36,8 @@ export function CombinedStatusPage() {
           ram: data.ram,
           ramTotal: data.ramTotal || 1228,
           vram: data.vram,
-          temp: data.temp || 0,
+          temp: data.temp || 0, // GPU温度
+          cpuTemp: data.cpuTemp || 0, // [新增] 接收后端的 CPU 温度
           isConnected: true,
         });
       } catch (e) {
@@ -171,7 +172,7 @@ export function CombinedStatusPage() {
                 label="CPU 内存卸载 (MoE Experts)"
                 percent={Math.round((stats.ram / stats.ramTotal) * 100)}
                 value={`${stats.ram} GB`}
-                desc="全量权重驻留于 1.2TB 主存，实现单机满血加载"
+                desc={`全量权重驻留于 ${stats.ramTotal} GB 主存，实现单机满血加载`}
                 color="#3b82f6"
               />
             </div>
@@ -187,7 +188,7 @@ export function CombinedStatusPage() {
               }}
             >
               <strong>技术突破：</strong> 采用 CPU-GPU 异构卸载技术，成功在双路
-              EPYC 平台实现 671B 模型私有化运行。
+              EPYC 平台实现模型私有化运行。
             </div>
           </div>
 
@@ -313,7 +314,7 @@ export function CombinedStatusPage() {
           </div>
         </div>
 
-        {/* 资源监控网格 (3列2行布局，保留温度) */}
+        {/* 资源监控网格 (3列2行布局，完美重构) */}
         <div
           style={{
             display: "grid",
@@ -322,6 +323,7 @@ export function CombinedStatusPage() {
             flexGrow: 1,
           }}
         >
+          {/* ----- 第一排：主机侧 (CPU & 内存) ----- */}
           <CompactStatCard
             title="CPU 综合负载"
             value={`${stats.cpu}%`}
@@ -329,6 +331,22 @@ export function CombinedStatusPage() {
             progress={stats.cpu}
             color="#3b82f6"
           />
+          <CompactStatCard
+            title="CPU 核心温度"
+            value={`${stats.cpuTemp || 0}°C`}
+            label={(stats.cpuTemp || 0) > 75 ? "负载较高" : "散热良好"}
+            progress={stats.cpuTemp || 0}
+            color={(stats.cpuTemp || 0) > 65 ? "#f59e0b" : "#3b82f6"}
+          />
+          <CompactStatCard
+            title="系统内存 (RAM)"
+            value={`${stats.ram} GB`}
+            label={`系统总内存量 ${stats.ramTotal} GB`}
+            progress={(stats.ram / stats.ramTotal) * 100}
+            color="#6366f1"
+          />
+
+          {/* ----- 第二排：设备侧 (GPU & 显存) ----- */}
           <CompactStatCard
             title="GPU 核心负载"
             value={`${stats.gpu}%`}
@@ -343,14 +361,6 @@ export function CombinedStatusPage() {
             progress={stats.temp}
             color={stats.temp > 65 ? "#f59e0b" : "#10b981"}
           />
-
-          <CompactStatCard
-            title="系统内存 (RAM)"
-            value={`${stats.ram} GB`}
-            label="系统总内存量 1.2TB"
-            progress={(stats.ram / stats.ramTotal) * 100}
-            color="#6366f1"
-          />
           <CompactStatCard
             title="计算显存 (VRAM)"
             value={`${stats.vram} GB`}
@@ -358,30 +368,6 @@ export function CombinedStatusPage() {
             progress={(stats.vram / 48) * 100}
             color="#10b981"
           />
-
-          {/* 右下角补齐的卡片：突出内核 */}
-          <div
-            style={{
-              padding: "16px",
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-              border: "1px solid #e2e8f0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              style={{
-                color: "#64748b",
-                fontSize: "14px",
-                fontWeight: "800",
-                letterSpacing: "0.5px",
-              }}
-            >
-              推理引擎: K-Transformers
-            </span>
-          </div>
         </div>
       </div>
     </div>
