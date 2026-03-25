@@ -55,6 +55,7 @@
 
     .sidebar-bar-button {
       flex-grow: 1;
+      transition: all 0.3s ease;
 
       &:not(:last-child) {
         margin-right: 10px;
@@ -64,6 +65,9 @@
 
   &:hover,
   &:active {
+    //background-color: var(--hover-color) !important; // 强制保持变深后的颜色
+    //border: 1px solid var(--primary); // 可选：加个边框，看起来更像“选中”状态
+    //box-shadow: inset var(--card-shadow); // 可选：加个内阴影，增加点击感
     .sidebar-drag {
       background-color: rgba($color: #000000, $alpha: 0.01);
 
@@ -376,4 +380,23 @@
 
 .rtl-screen {
   direction: rtl;
+}
+/* 在文件末尾添加以下内容 */
+.sidebar-logo {
+  display: inline-flex;
+  
+  /* 强制设置背景图为你的 SVG */
+  background-image: url("/big-ferrosemi-blue.svg"); 
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  /* 你需要手动指定一个宽度和高度，否则背景图显示不出来 */
+  width: 60px; 
+  height: 60px;
+
+  /* 隐藏原本可能存在的 SVG 标签（如果有的话） */
+  svg {
+    display: none;
+  }
 }

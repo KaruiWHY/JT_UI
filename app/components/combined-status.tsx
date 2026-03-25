@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { useMonitorStore } from "@/app/store/monitor";
 
@@ -9,8 +9,8 @@ import { useMonitorStore } from "@/app/store/monitor";
 export function CombinedStatusPage() {
   const monitorStore = useMonitorStore();
   const { stats } = monitorStore; // 直接从全局获取数据
-  
-  const SERVER_IP = "192.168.1.37"; 
+
+  const SERVER_IP = "192.168.1.37";
   const SERVER_PORT = "3001";
 
   const EMA_COEFF = 0.3;
@@ -18,113 +18,237 @@ export function CombinedStatusPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://${SERVER_IP}:${SERVER_PORT}/api/hardware`);
+        const response = await fetch(
+          `http://${SERVER_IP}:${SERVER_PORT}/api/hardware`,
+        );
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
         monitorStore.updateStats({
           // 逻辑优化：如果是第一次获取数据(当前为0)，直接赋值，不走EMA平滑，防止2秒延迟感
-          cpu: stats.cpu === 0 ? data.cpu : Math.round(stats.cpu * (1 - EMA_COEFF) + data.cpu * EMA_COEFF),
-          gpu: stats.gpu === 0 ? data.gpu : Math.round(stats.gpu * (1 - EMA_COEFF) + data.gpu * EMA_COEFF),
+          cpu:
+            stats.cpu === 0
+              ? data.cpu
+              : Math.round(stats.cpu * (1 - EMA_COEFF) + data.cpu * EMA_COEFF),
+          gpu:
+            stats.gpu === 0
+              ? data.gpu
+              : Math.round(stats.gpu * (1 - EMA_COEFF) + data.gpu * EMA_COEFF),
           ram: data.ram,
           ramTotal: data.ramTotal || 1228,
           vram: data.vram,
           temp: data.temp || 0,
-          isConnected: true
+          isConnected: true,
         });
       } catch (e) {
         monitorStore.updateStats({ isConnected: false });
       }
     };
-// 关键优化 1：组件挂载时立刻执行一次，不要等 1.5 秒
+    // 关键优化 1：组件挂载时立刻执行一次，不要等 1.5 秒
     fetchData();
 
     // 关键优化 2：持续轮询
     const timer = setInterval(fetchData, 1500);
     return () => clearInterval(timer);
-    
+
     // 注意：这里监听 stats.cpu 是为了闭包能拿到最新的平滑值
   }, [stats.cpu, stats.gpu]);
 
   // 极致压缩的全局容器：使用 overflow: hidden 强制不滚动
   const containerStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    backgroundColor: '#ffffff',
-    overflow: 'hidden', 
-    color: '#1f2937',
-    padding: '16px 24px', // 缩小外围边距
-    fontFamily: 'system-ui, -apple-system, sans-serif'
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    backgroundColor: "#ffffff",
+    overflow: "hidden",
+    color: "#1f2937",
+    padding: "16px 24px", // 缩小外围边距
+    fontFamily: "system-ui, -apple-system, sans-serif",
   };
 
   return (
     <div style={containerStyle as any}>
-      
       {/* ==========================================
           第1部分：模型运行引擎状态
           ========================================== */}
-      <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", flexShrink: 0 }}>
         {/* 标题区 */}
-        <div style={{ marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div
+          style={{
+            marginBottom: "12px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+          }}
+        >
           <div>
-            <h2 style={{ fontSize: "22px", fontWeight: "850", color: "#0f172a", margin: 0 }}>模型运行引擎状态</h2>
+            <h2
+              style={{
+                fontSize: "22px",
+                fontWeight: "850",
+                color: "#0f172a",
+                margin: 0,
+              }}
+            >
+              模型运行引擎状态
+            </h2>
           </div>
-          <div style={{ 
-            padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: '700',
-            backgroundColor: stats.isConnected ? "#ecfdf5" : "#f1f5f9", 
-            color: stats.isConnected ? "#059669" : "#64748b", 
-            border: `1px solid ${stats.isConnected ? "#10b981" : "#e2e8f0"}`
-          }}>
+          <div
+            style={{
+              padding: "4px 12px",
+              borderRadius: "6px",
+              fontSize: "11px",
+              fontWeight: "700",
+              backgroundColor: stats.isConnected ? "#ecfdf5" : "#f1f5f9",
+              color: stats.isConnected ? "#059669" : "#64748b",
+              border: `1px solid ${stats.isConnected ? "#10b981" : "#e2e8f0"}`,
+            }}
+          >
             引擎状态：{stats.isConnected ? "满血就绪" : "连接中"}
           </div>
         </div>
 
         {/* 顶部 4 个信息卡片 (高度压缩) */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
-          <MiniInfoCard label="推理后端" value="K-Transformers" sub="异构卸载内核" />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "12px",
+            marginBottom: "16px",
+          }}
+        >
+          <MiniInfoCard
+            label="推理后端"
+            value="K-Transformers"
+            sub="异构卸载内核"
+          />
           <MiniInfoCard label="量化精度" value="FP8 " sub="混合精度推理" />
-          <MiniInfoCard label="上下文长度" value="32K / 64K" sub="标准/可选扩展" />
+          <MiniInfoCard
+            label="上下文长度"
+            value="32K / 64K"
+            sub="标准/可选扩展"
+          />
           <MiniInfoCard label="当前并发" value="4 - 8 路" sub="推荐服务区间" />
         </div>
 
         {/* 拓扑图与性能表 (左右布局) */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "16px" }}>
-          
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.2fr 1fr",
+            gap: "16px",
+          }}
+        >
           {/* 左：权重驻留拓扑 */}
-          <div style={{ padding: "16px", border: "1px solid #e2e8f0", borderRadius: "16px", background: "#f8fafc" }}>
-            <h4 style={{ margin: "0 0 12px 0", fontSize: "14px", fontWeight: "800", color: "#1e293b" }}>▍ 权重驻留拓扑 (实时分布)</h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <CompactProgress 
-                label="GPU 显存驻留 (Attention / KV-Cache)" 
-                percent={Math.round((stats.vram / 48) * 100)} 
+          <div
+            style={{
+              padding: "16px",
+              border: "1px solid #e2e8f0",
+              borderRadius: "16px",
+              background: "#f8fafc",
+            }}
+          >
+            <h4
+              style={{
+                margin: "0 0 12px 0",
+                fontSize: "14px",
+                fontWeight: "800",
+                color: "#1e293b",
+              }}
+            >
+              ▍ 权重驻留拓扑 (实时分布)
+            </h4>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
+              <CompactProgress
+                label="GPU 显存驻留 (Attention / KV-Cache)"
+                percent={Math.round((stats.vram / 48) * 100)}
                 value={`${stats.vram} GB`}
                 desc="48GB 显存已分配，承载热数据与激活专家"
-                color="#10b981" 
+                color="#10b981"
               />
-              <CompactProgress 
-                label="CPU 内存卸载 (MoE Experts)" 
-                percent={Math.round((stats.ram / stats.ramTotal) * 100)} 
+              <CompactProgress
+                label="CPU 内存卸载 (MoE Experts)"
+                percent={Math.round((stats.ram / stats.ramTotal) * 100)}
                 value={`${stats.ram} GB`}
                 desc="全量权重驻留于 1.2TB 主存，实现单机满血加载"
-                color="#3b82f6" 
+                color="#3b82f6"
               />
             </div>
-            <div style={{ marginTop: "12px", padding: "8px 12px", backgroundColor: "#fff", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "11px", color: "#64748b" }}>
-               <strong>技术突破：</strong> 采用 CPU-GPU 异构卸载技术，成功在双路 EPYC 平台实现 671B 模型私有化运行。
+            <div
+              style={{
+                marginTop: "12px",
+                padding: "8px 12px",
+                backgroundColor: "#fff",
+                borderRadius: "8px",
+                border: "1px solid #e2e8f0",
+                fontSize: "11px",
+                color: "#64748b",
+              }}
+            >
+              <strong>技术突破：</strong> 采用 CPU-GPU 异构卸载技术，成功在双路
+              EPYC 平台实现 671B 模型私有化运行。
             </div>
           </div>
 
           {/* 右：性能基线 */}
-          <div style={{ padding: "16px", backgroundColor: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ fontSize: "14px", fontWeight: "850", marginBottom: "16px", color: "#0f172a" }}>▍ 推理引擎性能详情 (实测基线)</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", flexGrow: 1 }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <CompactDetailRow label="单会话输出吞吐:" value="7 - 12 tok/s" />
+          <div
+            style={{
+              padding: "16px",
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <h3
+              style={{
+                fontSize: "14px",
+                fontWeight: "850",
+                marginBottom: "16px",
+                color: "#0f172a",
+              }}
+            >
+              ▍ 推理引擎性能详情 (实测基线)
+            </h3>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "20px",
+                flexGrow: 1,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
+                <CompactDetailRow
+                  label="单会话输出吞吐:"
+                  value="7 - 12 tok/s"
+                />
                 <CompactDetailRow label="总吞吐:" value="20 - 30 tok/s" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <CompactDetailRow label="首 Token 延迟 (TTFT):" value="700 ms - 1.0 s" valueStyle={{ color: "#2563eb", fontWeight: "850" }} />
-                <CompactDetailRow label="批量预填充吞吐:" value="> 1000 tok/s" />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
+                <CompactDetailRow
+                  label="首 Token 延迟 (TTFT):"
+                  value="700 ms - 1.0 s"
+                  valueStyle={{ color: "#2563eb", fontWeight: "850" }}
+                />
+                <CompactDetailRow
+                  label="批量预填充吞吐:"
+                  value="> 1000 tok/s"
+                />
               </div>
             </div>
           </div>
@@ -132,45 +256,134 @@ export function CombinedStatusPage() {
       </div>
 
       {/* 超窄分割线 */}
-      <div style={{ borderTop: '1px solid #e2e8f0', margin: '16px 0', flexShrink: 0 }}></div>
+      <div
+        style={{
+          borderTop: "1px solid #e2e8f0",
+          margin: "16px 0",
+          flexShrink: 0,
+        }}
+      ></div>
 
       {/* ==========================================
           第2部分：一体机实时性能监控
           ========================================== */}
-      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-        <div style={{ marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div style={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+        <div
+          style={{
+            marginBottom: "12px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+          }}
+        >
           <div>
-            <h2 style={{ fontSize: "22px", fontWeight: "850", color: "#0f172a", margin: 0 }}>一体机实时性能监控</h2>
-            <p style={{ color: "#64748b", marginTop: "4px", fontSize: "13px", margin: '4px 0 0 0' }}>
+            <h2
+              style={{
+                fontSize: "22px",
+                fontWeight: "850",
+                color: "#0f172a",
+                margin: 0,
+              }}
+            >
+              一体机实时性能监控
+            </h2>
+            <p
+              style={{
+                color: "#64748b",
+                marginTop: "4px",
+                fontSize: "13px",
+                margin: "4px 0 0 0",
+              }}
+            >
               正在连接：双路 AMD EPYC 9135 + 1.2TB DDR5 + 双 RTX 4090D
             </p>
           </div>
-          <div style={{ 
-            padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: '700',
-            backgroundColor: stats.isConnected ? '#ecfdf5' : '#fef2f2',
-            color: stats.isConnected ? '#059669' : '#dc2626',
-            border: `1px solid ${stats.isConnected ? '#10b981' : '#f87171'}`
-          }}>
+          <div
+            style={{
+              padding: "4px 12px",
+              borderRadius: "6px",
+              fontSize: "11px",
+              fontWeight: "700",
+              backgroundColor: stats.isConnected ? "#ecfdf5" : "#fef2f2",
+              color: stats.isConnected ? "#059669" : "#dc2626",
+              border: `1px solid ${stats.isConnected ? "#10b981" : "#f87171"}`,
+            }}
+          >
             ● {stats.isConnected ? "远程服务器已联通" : "尝试连接服务器中..."}
           </div>
         </div>
-        
+
         {/* 资源监控网格 (3列2行布局，保留温度) */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", flexGrow: 1 }}>
-          <CompactStatCard title="CPU 综合负载" value={`${stats.cpu}%`} label="双路 EPYC 9135" progress={stats.cpu} color="#3b82f6" />
-          <CompactStatCard title="GPU 核心负载" value={`${stats.gpu}%`} label="双路 4090D" progress={stats.gpu} color="#8b5cf6" />
-          <CompactStatCard title="GPU 核心温度" value={`${stats.temp}°C`} label={stats.temp > 75 ? "负载较高" : "散热良好"} progress={stats.temp} color={stats.temp > 65 ? "#f59e0b" : "#10b981"} />
-          
-          <CompactStatCard title="系统内存 (RAM)" value={`${stats.ram} GB`} label="标准配置 1.2TB" progress={(stats.ram / stats.ramTotal) * 100} color="#6366f1" />
-          <CompactStatCard title="计算显存 (VRAM)" value={`${stats.vram} GB`} label="总显存 48GB" progress={(stats.vram / 48) * 100} color="#10b981" />
-          
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "12px",
+            flexGrow: 1,
+          }}
+        >
+          <CompactStatCard
+            title="CPU 综合负载"
+            value={`${stats.cpu}%`}
+            label="双路 EPYC 9135"
+            progress={stats.cpu}
+            color="#3b82f6"
+          />
+          <CompactStatCard
+            title="GPU 核心负载"
+            value={`${stats.gpu}%`}
+            label="双路 4090D"
+            progress={stats.gpu}
+            color="#8b5cf6"
+          />
+          <CompactStatCard
+            title="GPU 核心温度"
+            value={`${stats.temp}°C`}
+            label={stats.temp > 75 ? "负载较高" : "散热良好"}
+            progress={stats.temp}
+            color={stats.temp > 65 ? "#f59e0b" : "#10b981"}
+          />
+
+          <CompactStatCard
+            title="系统内存 (RAM)"
+            value={`${stats.ram} GB`}
+            label="系统总内存量 1.2TB"
+            progress={(stats.ram / stats.ramTotal) * 100}
+            color="#6366f1"
+          />
+          <CompactStatCard
+            title="计算显存 (VRAM)"
+            value={`${stats.vram} GB`}
+            label="总显存 48GB"
+            progress={(stats.vram / 48) * 100}
+            color="#10b981"
+          />
+
           {/* 右下角补齐的卡片：突出内核 */}
-          <div style={{ padding: '16px', borderRadius: '16px', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '800', letterSpacing: '0.5px' }}>推理引擎: K-Transformers</span>
+          <div
+            style={{
+              padding: "16px",
+              borderRadius: "16px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              style={{
+                color: "#64748b",
+                fontSize: "14px",
+                fontWeight: "800",
+                letterSpacing: "0.5px",
+              }}
+            >
+              推理引擎: K-Transformers
+            </span>
           </div>
         </div>
       </div>
-
     </div>
   );
 }
@@ -181,9 +394,34 @@ export function CombinedStatusPage() {
 
 function MiniInfoCard({ label, value, sub }: any) {
   return (
-    <div style={{ padding: "12px 16px", backgroundColor: "#fff", border: "1px solid #e2e8f0", borderRadius: "12px" }}>
-      <p style={{ fontSize: "11px", color: "#94a3b8", margin: "0 0 2px 0", fontWeight: "600" }}>{label}</p>
-      <p style={{ fontSize: "15px", fontWeight: "850", margin: "0 0 2px 0", color: "#0f172a" }}>{value}</p>
+    <div
+      style={{
+        padding: "12px 16px",
+        backgroundColor: "#fff",
+        border: "1px solid #e2e8f0",
+        borderRadius: "12px",
+      }}
+    >
+      <p
+        style={{
+          fontSize: "11px",
+          color: "#94a3b8",
+          margin: "0 0 2px 0",
+          fontWeight: "600",
+        }}
+      >
+        {label}
+      </p>
+      <p
+        style={{
+          fontSize: "15px",
+          fontWeight: "850",
+          margin: "0 0 2px 0",
+          color: "#0f172a",
+        }}
+      >
+        {value}
+      </p>
       <p style={{ fontSize: "10px", color: "#64748b", margin: 0 }}>{sub}</p>
     </div>
   );
@@ -192,12 +430,35 @@ function MiniInfoCard({ label, value, sub }: any) {
 function CompactProgress({ label, percent, value, desc, color }: any) {
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "4px",
+        }}
+      >
         <span style={{ fontSize: "12px", fontWeight: "700" }}>{label}</span>
-        <span style={{ fontSize: "12px", fontWeight: "800", color: color }}>{value}</span>
+        <span style={{ fontSize: "12px", fontWeight: "800", color: color }}>
+          {value}
+        </span>
       </div>
-      <div style={{ height: "6px", backgroundColor: "#e2e8f0", borderRadius: "3px", overflow: "hidden", marginBottom: "4px" }}>
-        <div style={{ width: `${Math.min(percent, 100)}%`, height: "100%", backgroundColor: color, transition: 'width 1.5s ease' }}></div>
+      <div
+        style={{
+          height: "6px",
+          backgroundColor: "#e2e8f0",
+          borderRadius: "3px",
+          overflow: "hidden",
+          marginBottom: "4px",
+        }}
+      >
+        <div
+          style={{
+            width: `${Math.min(percent, 100)}%`,
+            height: "100%",
+            backgroundColor: color,
+            transition: "width 1.5s ease",
+          }}
+        ></div>
       </div>
       <p style={{ fontSize: "10px", color: "#64748b", margin: 0 }}>{desc}</p>
     </div>
@@ -206,22 +467,94 @@ function CompactProgress({ label, percent, value, desc, color }: any) {
 
 function CompactDetailRow({ label, value, valueStyle = {} }: any) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingBottom: "6px", borderBottom: "1px solid #f1f5f9" }}>
-      <span style={{ color: "#64748b", fontSize: "11px", fontWeight: "600" }}>{label}</span>
-      <span style={{ color: "#0f172a", fontSize: "13px", fontWeight: "700", fontFamily: "monospace", ...valueStyle }}>{value}</span>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
+        paddingBottom: "6px",
+        borderBottom: "1px solid #f1f5f9",
+      }}
+    >
+      <span style={{ color: "#64748b", fontSize: "11px", fontWeight: "600" }}>
+        {label}
+      </span>
+      <span
+        style={{
+          color: "#0f172a",
+          fontSize: "13px",
+          fontWeight: "700",
+          fontFamily: "monospace",
+          ...valueStyle,
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
 
 function CompactStatCard({ title, value, label, progress, color }: any) {
   return (
-    <div style={{ padding: '16px', border: '1px solid #e2e8f0', borderRadius: '16px', backgroundColor: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px', fontWeight: '700' }}>{title}</p>
-      <h3 style={{ fontSize: '20px', fontWeight: '850', margin: '0 0 8px 0', color: '#0f172a' }}>{value}</h3>
-      <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden', marginBottom: '8px' }}>
-        <div style={{ width: `${Math.min(progress, 100)}%`, height: '100%', background: color, transition: 'width 1s ease' }}></div>
+    <div
+      style={{
+        padding: "16px",
+        border: "1px solid #e2e8f0",
+        borderRadius: "16px",
+        backgroundColor: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      <p
+        style={{
+          fontSize: "11px",
+          color: "#94a3b8",
+          marginBottom: "4px",
+          fontWeight: "700",
+        }}
+      >
+        {title}
+      </p>
+      <h3
+        style={{
+          fontSize: "20px",
+          fontWeight: "850",
+          margin: "0 0 8px 0",
+          color: "#0f172a",
+        }}
+      >
+        {value}
+      </h3>
+      <div
+        style={{
+          height: "6px",
+          background: "#f1f5f9",
+          borderRadius: "3px",
+          overflow: "hidden",
+          marginBottom: "8px",
+        }}
+      >
+        <div
+          style={{
+            width: `${Math.min(progress, 100)}%`,
+            height: "100%",
+            background: color,
+            transition: "width 1s ease",
+          }}
+        ></div>
       </div>
-      <p style={{ fontSize: '11px', color: '#64748b', fontWeight: '500', margin: 0 }}>{label}</p>
+      <p
+        style={{
+          fontSize: "11px",
+          color: "#64748b",
+          fontWeight: "500",
+          margin: 0,
+        }}
+      >
+        {label}
+      </p>
     </div>
   );
 }
