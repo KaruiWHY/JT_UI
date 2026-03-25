@@ -1,53 +1,49 @@
 import { useState, useEffect } from "react";
-import { ACCESS_CODE_PREFIX } from "@/app/constant";
-import { useAccessStore } from "@/app/store";
+
+import { useMonitorStore } from "@/app/store/monitor";
 
 // =========================================
 // 大模型推理一体机综合看板 (极致紧凑一屏版)
 // =========================================
 
 export function CombinedStatusPage() {
-  const accessStore = useAccessStore();
+  const monitorStore = useMonitorStore();
+  const { stats } = monitorStore; // 直接从全局获取数据
+  
+  const SERVER_IP = "192.168.1.37"; 
+  const SERVER_PORT = "3001";
 
-  const [stats, setStats] = useState({
-    cpu: 0, gpu: 0, vram: 0, ram: 0, ramTotal: 1228, temp: 0, isConnected: false
-  });
   const EMA_COEFF = 0.3;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const headers: Record<string, string> = {};
-        if (accessStore.accessCode) {
-          headers.Authorization = `Bearer ${ACCESS_CODE_PREFIX}${accessStore.accessCode}`;
-        }
-
-        const response = await fetch("/api/service/sglang/hardware", {
-          headers,
-          cache: "no-store",
-        });
+        const response = await fetch(`http://${SERVER_IP}:${SERVER_PORT}/api/hardware`);
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
-        const metrics = data?.data ?? data;
-
-        setStats(prev => ({
-          cpu: Math.round(prev.cpu * (1 - EMA_COEFF) + (metrics.cpu || 0) * EMA_COEFF),
-          gpu: Math.round(prev.gpu * (1 - EMA_COEFF) + (metrics.gpu || 0) * EMA_COEFF),
-          ram: metrics.ram || 0,
-          ramTotal: metrics.ramTotal || 1228,
-          vram: metrics.vram || 0,
-          temp: metrics.temp || 0,
+        monitorStore.updateStats({
+          // 逻辑优化：如果是第一次获取数据(当前为0)，直接赋值，不走EMA平滑，防止2秒延迟感
+          cpu: stats.cpu === 0 ? data.cpu : Math.round(stats.cpu * (1 - EMA_COEFF) + data.cpu * EMA_COEFF),
+          gpu: stats.gpu === 0 ? data.gpu : Math.round(stats.gpu * (1 - EMA_COEFF) + data.gpu * EMA_COEFF),
+          ram: data.ram,
+          ramTotal: data.ramTotal || 1228,
+          vram: data.vram,
+          temp: data.temp || 0,
           isConnected: true
-        }));
+        });
       } catch (e) {
-        setStats(prev => ({ ...prev, isConnected: false }));
+        monitorStore.updateStats({ isConnected: false });
       }
     };
+// 关键优化 1：组件挂载时立刻执行一次，不要等 1.5 秒
+    fetchData();
 
-    // 为保证丝滑，维持较高刷新率
+    // 关键优化 2：持续轮询
     const timer = setInterval(fetchData, 1500);
     return () => clearInterval(timer);
-  }, [accessStore.accessCode]);
+    
+    // 注意：这里监听 stats.cpu 是为了闭包能拿到最新的平滑值
+  }, [stats.cpu, stats.gpu]);
 
   // 极致压缩的全局容器：使用 overflow: hidden 强制不滚动
   const containerStyle = {

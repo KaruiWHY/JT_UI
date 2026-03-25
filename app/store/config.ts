@@ -46,7 +46,7 @@ export const DEFAULT_CONFIG = {
   fontSize: 14,
   fontFamily: "",
   theme: Theme.Auto as Theme,
-  tightBorder: !!config?.isApp,
+  tightBorder: true,
   sendPreviewBubble: true,
   enableAutoGenerateTitle: true,
   sidebarWidth: DEFAULT_SIDEBAR_WIDTH,
@@ -106,7 +106,7 @@ export const DEFAULT_CONFIG = {
   },
 
   grafanaConfig: {
-    url: "http://192.168.1.93:3000/",
+    url: "http://192.168.1.37:3000/",
   },
 
   openclawConfig: {

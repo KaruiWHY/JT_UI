@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useAppConfig } from "../store/config";
 import { IconButton } from "./button";
 
-const DEFAULT_GRAFANA_URL = "http://192.168.1.93:3000/";
+const DEFAULT_GRAFANA_URL = "http://192.168.1.37:3000/";
 
 function normalizeUrl(url: string) {
   const trimmed = url.trim();

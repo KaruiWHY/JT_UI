@@ -227,7 +227,7 @@ export function MessageExporter() {
               ))}
             </Select>
           </ListItem>
-          <ListItem
+          {/* <ListItem
             title={Locale.Export.IncludeContext.Title}
             subTitle={Locale.Export.IncludeContext.SubTitle}
           >
@@ -240,7 +240,7 @@ export function MessageExporter() {
                 );
               }}
             ></input>
-          </ListItem>
+          </ListItem> */}
         </List>
         <MessageSelector
           selection={selection}
@@ -380,13 +380,13 @@ export function PreviewActions(props: {
           icon={<DownloadIcon />}
           onClick={props.download}
         ></IconButton>
-        <IconButton
+        {/* <IconButton
           text={Locale.Export.Share}
           bordered
           shadow
           icon={loading ? <LoadingIcon /> : <ShareIcon />}
           onClick={share}
-        ></IconButton>
+        ></IconButton> */}
       </div>
       <div
         style={{
@@ -524,9 +524,9 @@ export function ImagePreviewer(props: {
           </div>
 
           <div>
-            <div className={styles["main-title"]}>NextChat</div>
+            <div className={styles["main-title"]}>晶铁 普惠AI</div>
             <div className={styles["sub-title"]}>
-              github.com/ChatGPTNextWeb/ChatGPT-Next-Web
+              https://www.ferrosemi.com/
             </div>
             <div className={styles["icons"]}>
               <MaskAvatar avatar={config.avatar} />
