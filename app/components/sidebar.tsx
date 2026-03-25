@@ -4,7 +4,6 @@ import styles from "./home.module.scss";
 
 import { IconButton } from "./button";
 import SettingsIcon from "../icons/settings.svg";
-import GithubIcon from "../icons/github.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
 import McpIcon from "../icons/mcp.svg";
@@ -21,7 +20,6 @@ import {
   MIN_SIDEBAR_WIDTH,
   NARROW_SIDEBAR_WIDTH,
   Path,
-  REPO_URL,
 } from "../constant";
 
 import { useNavigate } from "react-router-dom";
@@ -368,15 +366,15 @@ export function SideBar(props: { className?: string }) {
       </SideBarBody>
 
       <SideBarTail
-        primaryAction={
-          <>
-            <div className={styles["sidebar-action"]}>
-              <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-                <IconButton icon={<GithubIcon />} shadow />
-              </a>
-            </div>
-          </>
-        }
+        // primaryAction={
+        //   <>
+        //     <div className={styles["sidebar-action"]}>
+        //       <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+        //         <IconButton icon={<GithubIcon />} shadow />
+        //       </a>
+        //     </div>
+        //   </>
+        // }
         secondaryAction={
           <IconButton
             icon={<AddIcon />}
