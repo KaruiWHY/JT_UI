@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import { ACCESS_CODE_PREFIX } from "@/app/constant";
+import { useAccessStore } from "@/app/store";
 
 export function ModelStatusPage() {
-  // 【重要】请修改为你服务器的真实 IP
-  const SERVER_IP = "192.168.1.93";
-  const SERVER_PORT = "3001";
+  const accessStore = useAccessStore();
 
   const [realData, setRealData] = useState({
     ram: 0,
@@ -16,14 +16,21 @@ export function ModelStatusPage() {
   useEffect(() => {
     const checkEngine = async () => {
       try {
-        const res = await fetch(
-          `http://${SERVER_IP}:${SERVER_PORT}/api/hardware`,
-        );
+        const headers: Record<string, string> = {};
+        if (accessStore.accessCode) {
+          headers.Authorization = `Bearer ${ACCESS_CODE_PREFIX}${accessStore.accessCode}`;
+        }
+
+        const res = await fetch("/api/service/sglang/hardware", {
+          headers,
+          cache: "no-store",
+        });
         const data = await res.json();
+        const metrics = data?.data ?? data;
         setRealData({
-          ram: data.ram,
-          vram: data.vram,
-          status: data.vram > 30 ? "满血就绪" : "待机中",
+          ram: metrics.ram || 0,
+          vram: metrics.vram || 0,
+          status: (metrics.vram || 0) > 30 ? "满血就绪" : "待机中",
           isConnected: true,
         });
       } catch (e) {
@@ -38,7 +45,7 @@ export function ModelStatusPage() {
     checkEngine();
     const timer = setInterval(checkEngine, 3000);
     return () => clearInterval(timer);
-  }, []);
+  }, [accessStore.accessCode]);
 
   const containerStyle = {
     display: "flex",

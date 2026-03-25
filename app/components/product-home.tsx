@@ -1,5 +1,6 @@
 import { Path } from "../constant";
 import { useNavigate } from "react-router-dom";
+import CompanyLogo from "../icons/brand/company-logo-blue-gradient.svg";
 
 export function ProductHomePage() {
   const navigate = useNavigate();
@@ -25,6 +26,15 @@ export function ProductHomePage() {
     <div style={containerStyle as any}>
       {/* 1. Hero 视觉区 */}
       <section style={heroSectionStyle as any}>
+        <div style={{ marginBottom: '20px' }}>
+          <CompanyLogo
+            style={{
+              width: 'auto',
+              maxWidth: '85vw',
+              height: 'auto',
+            }}
+          />
+        </div>
         <div style={{
           display: 'inline-block',
           padding: '6px 16px',

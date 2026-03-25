@@ -30,6 +30,15 @@ import dynamic from "next/dynamic";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 
+const DEFAULT_OPENCLAW_URL = "http://localhost:18789/openclaw/";
+
+function normalizeOpenclawUrl(url: string) {
+  const trimmed = url.trim();
+  if (!trimmed) return DEFAULT_OPENCLAW_URL;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `http://${trimmed}`;
+}
+
 const DISCOVERY = [
   { name: Locale.Plugin.Name, path: Path.Plugins },
   { name: "Stable Diffusion", path: Path.Sd },
@@ -230,6 +239,13 @@ export function SideBar(props: { className?: string }) {
   const chatStore = useChatStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
+  const openOpenclaw = () => {
+    const targetUrl = normalizeOpenclawUrl(
+      config.openclawConfig?.url ?? DEFAULT_OPENCLAW_URL,
+    );
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
+  };
+
   useEffect(() => {
     const checkMcpStatus = async () => {
       const enabled = await isMcpEnabled();
@@ -313,7 +329,21 @@ export function SideBar(props: { className?: string }) {
             onClick={() => navigate(Path.Dashboard)}
             className={styles["sidebar-bar-button"]}
             shadow
-          /> 
+          />
+          <IconButton
+            icon={<DiscoveryIcon />}
+            text={shouldNarrow ? undefined : "实时指标"}
+            onClick={() => navigate(Path.Grafana)}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
+          <IconButton
+            icon={<McpIcon />}
+            text={shouldNarrow ? undefined : "Openclaw"}
+            onClick={openOpenclaw}
+            className={styles["sidebar-bar-button"]}
+            shadow
+          />
           <IconButton
             icon={<DragIcon />}
             text={shouldNarrow ? undefined : "样机展示"}
