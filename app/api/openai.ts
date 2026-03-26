@@ -1,3 +1,6 @@
+// 使用Node.js Runtime而不是Edge Runtime
+export const runtime = "nodejs";
+
 import { type OpenAIListModelResponse } from "@/app/client/platforms/openai";
 import { getServerSideConfig } from "@/app/config/server";
 import { ModelProvider, OpenaiPath } from "@/app/constant";

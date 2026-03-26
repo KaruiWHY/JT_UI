@@ -12,7 +12,7 @@ import DiscoveryIcon from "../icons/discovery.svg";
 
 import Locale from "../locales";
 
-import { useAppConfig, useChatStore } from "../store";
+import { useAppConfig, useChatStore, useAccessStore } from "../store";
 
 import {
   DEFAULT_SIDEBAR_WIDTH,
@@ -235,7 +235,9 @@ export function SideBar(props: { className?: string }) {
   const navigate = useNavigate();
   const config = useAppConfig();
   const chatStore = useChatStore();
+  const accessStore = useAccessStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
+  const isAdmin = accessStore.isAdmin();
 
   const openOpenclaw = () => {
     const targetUrl = normalizeOpenclawUrl(
@@ -321,20 +323,31 @@ export function SideBar(props: { className?: string }) {
             className={styles["sidebar-bar-button"]}
             shadow
           />
-          <IconButton
-            icon={<AddIcon />}
-            text={shouldNarrow ? undefined : "模型监控"}
-            onClick={() => navigate(Path.Dashboard)}
-            className={styles["sidebar-bar-button"]}
-            shadow
-          />
-          <IconButton
-            icon={<DiscoveryIcon />}
-            text={shouldNarrow ? undefined : "实时指标"}
-            onClick={() => navigate(Path.Grafana)}
-            className={styles["sidebar-bar-button"]}
-            shadow
-          />
+          {isAdmin && (
+            <>
+              <IconButton
+                icon={<AddIcon />}
+                text={shouldNarrow ? undefined : "模型监控"}
+                onClick={() => navigate(Path.Dashboard)}
+                className={styles["sidebar-bar-button"]}
+                shadow
+              />
+              <IconButton
+                icon={<DiscoveryIcon />}
+                text={shouldNarrow ? undefined : "实时指标"}
+                onClick={() => navigate(Path.Grafana)}
+                className={styles["sidebar-bar-button"]}
+                shadow
+              />
+              <IconButton
+                icon={<SettingsIcon />}
+                text={shouldNarrow ? undefined : "用户管理"}
+                onClick={() => navigate(Path.UserManagement)}
+                className={styles["sidebar-bar-button"]}
+                shadow
+              />
+            </>
+          )}
           <IconButton
             icon={<McpIcon />}
             text={shouldNarrow ? undefined : "Openclaw"}
@@ -366,15 +379,27 @@ export function SideBar(props: { className?: string }) {
       </SideBarBody>
 
       <SideBarTail
-        // primaryAction={
-        //   <>
-        //     <div className={styles["sidebar-action"]}>
-        //       <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-        //         <IconButton icon={<GithubIcon />} shadow />
-        //       </a>
-        //     </div>
-        //   </>
-        // }
+        primaryAction={
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', padding: '0 10px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-color-secondary)', textAlign: 'center' }}>
+              {accessStore.userSession?.user?.username}
+              <br />
+              <span style={{ fontSize: '10px' }}>
+                {accessStore.userSession?.user?.role === 'admin' ? '管理员' : '普通用户'}
+              </span>
+            </div>
+            <IconButton
+              icon={<SettingsIcon />}
+              text={shouldNarrow ? undefined : "登出"}
+              onClick={() => {
+                accessStore.logout();
+                navigate(Path.Auth);
+              }}
+              shadow
+              style={{ width: '100%' }}
+            />
+          </div>
+        }
         secondaryAction={
           <IconButton
             icon={<AddIcon />}

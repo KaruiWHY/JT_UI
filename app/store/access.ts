@@ -65,6 +65,7 @@ const DEFAULT_AI302_URL = isApp ? AI302_BASE_URL : ApiPath["302.AI"];
 const DEFAULT_ACCESS_STATE = {
   accessCode: "",
   useCustomConfig: false,
+  userSession: null as any,
 
   provider: ServiceProvider.OpenAI,
 
@@ -246,8 +247,29 @@ export const useAccessStore = createPersistStore(
         this.isValidChatGLM() ||
         this.isValidSiliconFlow() ||
         !this.enabledAccessControl() ||
-        (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
+        (this.enabledAccessControl() && ensure(get(), ["accessCode"])) ||
+        this.isLoggedIn()
       );
+    },
+
+    isLoggedIn() {
+      return !!get().userSession;
+    },
+
+    isAdmin() {
+      return get().userSession?.user?.role === 'admin';
+    },
+
+    login(userSession: any) {
+      set((state) => ({ ...state, userSession }));
+    },
+
+    logout() {
+      set((state) => ({ ...state, userSession: null }));
+    },
+
+    getUserRole() {
+      return get().userSession?.user?.role || 'user';
     },
     fetch() {
       if (fetchState > 0 || getClientConfig()?.buildMode === "export") return;

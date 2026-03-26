@@ -19,12 +19,41 @@ import ar from "./ar";
 import bn from "./bn";
 import sk from "./sk";
 import { merge } from "../utils/merge";
-import { safeLocalStorage } from "@/app/utils";
 
 import type { LocaleType } from "./cn";
 export type { LocaleType, PartialLocaleType } from "./cn";
 
-const localStorage = safeLocalStorage();
+const LANG_KEY = "lang";
+const DEFAULT_LANG = "en";
+
+// 延迟加载 safeLocalStorage，避免循环依赖
+let localStorage: any = null;
+function getLocalStorage() {
+  if (!localStorage) {
+    const { safeLocalStorage } = require("@/app/utils");
+    localStorage = safeLocalStorage();
+  }
+  return localStorage;
+}
+
+function getItem(key: string) {
+  try {
+    const storage = getLocalStorage();
+    return storage.getItem(key);
+  } catch (error) {
+    console.error("Error getting item from localStorage:", error);
+    return null;
+  }
+}
+
+function setItem(key: string, value: string) {
+  try {
+    const storage = getLocalStorage();
+    storage.setItem(key, value);
+  } catch (error) {
+    console.error("Error setting item in localStorage:", error);
+  }
+}
 
 const ALL_LANGS = {
   cn,
@@ -76,36 +105,19 @@ export const ALL_LANG_OPTIONS: Record<Lang, string> = {
   sk: "Slovensky",
 };
 
-const LANG_KEY = "lang";
-const DEFAULT_LANG = "en";
-
-const fallbackLang = en;
-const targetLang = ALL_LANGS[getLang()] as LocaleType;
-
-// if target lang missing some fields, it will use fallback lang string
-merge(fallbackLang, targetLang);
-
-export default fallbackLang as LocaleType;
-
-function getItem(key: string) {
-  return localStorage.getItem(key);
-}
-
-function setItem(key: string, value: string) {
-  localStorage.setItem(key, value);
-}
-
 function getLanguage() {
   try {
-    const locale = new Intl.Locale(navigator.language).maximize();
-    const region = locale?.region?.toLowerCase();
-    // 1. check region code in ALL_LANGS
-    if (AllLangs.includes(region as Lang)) {
-      return region as Lang;
-    }
-    // 2. check language code in ALL_LANGS
-    if (AllLangs.includes(locale.language as Lang)) {
-      return locale.language as Lang;
+    if (typeof navigator !== "undefined") {
+      const locale = new Intl.Locale(navigator.language).maximize();
+      const region = locale?.region?.toLowerCase();
+      // 1. check region code in ALL_LANGS
+      if (AllLangs.includes(region as Lang)) {
+        return region as Lang;
+      }
+      // 2. check language code in ALL_LANGS
+      if (AllLangs.includes(locale.language as Lang)) {
+        return locale.language as Lang;
+      }
     }
     return DEFAULT_LANG;
   } catch {
@@ -114,7 +126,7 @@ function getLanguage() {
 }
 
 export function getLang(): Lang {
-  const savedLang = getItem(LANG_KEY);
+  const savedLang = getItem("lang");
 
   if (AllLangs.includes((savedLang ?? "") as Lang)) {
     return savedLang as Lang;
@@ -122,6 +134,18 @@ export function getLang(): Lang {
 
   return getLanguage();
 }
+
+const fallbackLang = en;
+const lang = getLang();
+console.log("[Locales] Selected language:", lang);
+const targetLang = ALL_LANGS[lang] as LocaleType;
+console.log("[Locales] Target language object:", targetLang);
+
+// if target lang missing some fields, it will use fallback lang string
+merge(fallbackLang, targetLang);
+console.log("[Locales] Final merged language object:", fallbackLang);
+
+export default fallbackLang as LocaleType;
 
 export function changeLang(lang: Lang) {
   setItem(LANG_KEY, lang);

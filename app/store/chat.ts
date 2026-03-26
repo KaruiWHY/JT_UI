@@ -95,16 +95,39 @@ export interface ChatSession {
   mask: Mask;
 }
 
-export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
-export const BOT_HELLO: ChatMessage = createMessage({
-  role: "assistant",
-  content: Locale.Store.BotHello,
-});
+// 使用函数来延迟访问 Locale，避免服务器端渲染时的错误
+export function getDefaultTopic() {
+  try {
+    return Locale.Store.DefaultTopic;
+  } catch (error) {
+    console.error("Error accessing Locale.Store.DefaultTopic:", error);
+    return "New Conversation";
+  }
+}
+
+export function getBotHello(): ChatMessage {
+  try {
+    return createMessage({
+      role: "assistant",
+      content: Locale.Store.BotHello,
+    });
+  } catch (error) {
+    console.error("Error accessing Locale.Store.BotHello:", error);
+    return createMessage({
+      role: "assistant",
+      content: "Hello! How can I assist you today?",
+    });
+  }
+}
+
+// 为了向后兼容，仍然导出默认值
+export const DEFAULT_TOPIC = getDefaultTopic();
+export const BOT_HELLO = getBotHello();
 
 function createEmptySession(): ChatSession {
   return {
     id: nanoid(),
-    topic: DEFAULT_TOPIC,
+    topic: getDefaultTopic(),
     memoryPrompt: "",
     messages: [],
     stat: {
@@ -528,16 +551,25 @@ export const useChatStore = createPersistStore(
       },
 
       getMemoryPrompt() {
-        const session = get().currentSession();
+    const session = get().currentSession();
 
-        if (session.memoryPrompt.length) {
-          return {
-            role: "system",
-            content: Locale.Store.Prompt.History(session.memoryPrompt),
-            date: "",
-          } as ChatMessage;
-        }
-      },
+    if (session.memoryPrompt.length) {
+      try {
+        return {
+          role: "system",
+          content: Locale.Store.Prompt.History(session.memoryPrompt),
+          date: "",
+        } as ChatMessage;
+      } catch (error) {
+        console.error("Error accessing Locale.Store.Prompt.History:", error);
+        return {
+          role: "system",
+          content: "This is a summary of the chat history as a recap: " + session.memoryPrompt,
+          date: "",
+        } as ChatMessage;
+      }
+    }
+  },
 
       async getMessagesWithMemory() {
         const session = get().currentSession();
@@ -695,16 +727,23 @@ export const useChatStore = createPersistStore(
             messages.length - modelConfig.historyMessageCount,
           );
           const topicMessages = messages
-            .slice(
-              startIndex < messages.length ? startIndex : messages.length - 1,
-              messages.length,
-            )
-            .concat(
-              createMessage({
-                role: "user",
-                content: Locale.Store.Prompt.Topic,
-              }),
-            );
+          .slice(
+            startIndex < messages.length ? startIndex : messages.length - 1,
+            messages.length,
+          )
+          .concat(
+            createMessage({
+              role: "user",
+              content: (() => {
+                try {
+                  return Locale.Store.Prompt.Topic;
+                } catch (error) {
+                  console.error("Error accessing Locale.Store.Prompt.Topic:", error);
+                  return "Please generate a four to five word title summarizing our conversation without any lead-in, punctuation, quotation marks, periods, symbols, bold text, or additional text. Remove enclosing quotation marks.";
+                }
+              })(),
+            }),
+          );
           api.llm.chat({
             messages: topicMessages,
             config: {
@@ -756,21 +795,28 @@ export const useChatStore = createPersistStore(
         );
 
         if (
-          historyMsgLength > modelConfig.compressMessageLengthThreshold &&
-          modelConfig.sendMemory
-        ) {
-          /** Destruct max_tokens while summarizing
-           * this param is just shit
-           **/
-          const { max_tokens, ...modelcfg } = modelConfig;
-          api.llm.chat({
-            messages: toBeSummarizedMsgs.concat(
-              createMessage({
-                role: "system",
-                content: Locale.Store.Prompt.Summarize,
-                date: "",
-              }),
-            ),
+        historyMsgLength > modelConfig.compressMessageLengthThreshold &&
+        modelConfig.sendMemory
+      ) {
+        /** Destruct max_tokens while summarizing
+         * this param is just shit
+         **/
+        const { max_tokens, ...modelcfg } = modelConfig;
+        api.llm.chat({
+          messages: toBeSummarizedMsgs.concat(
+            createMessage({
+              role: "system",
+              content: (() => {
+                try {
+                  return Locale.Store.Prompt.Summarize;
+                } catch (error) {
+                  console.error("Error accessing Locale.Store.Prompt.Summarize:", error);
+                  return "Summarize the discussion briefly in 200 words or less to use as a prompt for future context.";
+                }
+              })(),
+              date: "",
+            }),
+          ),
             config: {
               ...modelcfg,
               stream: true,

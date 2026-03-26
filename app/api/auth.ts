@@ -1,7 +1,24 @@
+// 使用Node.js Runtime而不是Edge Runtime
+export const runtime = "nodejs";
+
 import { NextRequest } from "next/server";
 import { getServerSideConfig } from "../config/server";
 import md5 from "spark-md5";
 import { ACCESS_CODE_PREFIX, ModelProvider } from "../constant";
+
+// 条件导入，避免在Edge Runtime中加载fs模块
+let verifyToken: (token: string) => any = () => null;
+
+// 仅在非Edge Runtime环境中尝试导入
+if (typeof window === 'undefined' && process && process.env && process.env.NODE_ENV) {
+  try {
+    const { verifyToken: importedVerifyToken } = require("./auth/users");
+    verifyToken = importedVerifyToken;
+  } catch (e) {
+    // 在Edge Runtime中，verifyToken会保持为null函数，但这没关系
+    console.log("[Auth] Running in Edge Runtime, JWT verification disabled");
+  }
+}
 
 function getIP(req: NextRequest) {
   let ip = req.ip ?? req.headers.get("x-real-ip");
@@ -26,6 +43,18 @@ function parseApiKey(bearToken: string) {
 
 export function auth(req: NextRequest, modelProvider: ModelProvider) {
   const authToken = req.headers.get("Authorization") ?? "";
+
+  // check if it is JWT token
+  if (authToken.startsWith("Bearer ")) {
+    const token = authToken.replace("Bearer ", "");
+    const decoded = verifyToken(token);
+    if (decoded) {
+      console.log("[Auth] valid JWT token", decoded);
+      return {
+        error: false,
+      };
+    }
+  }
 
   // check if it is openai api key or user token
   const { accessCode, apiKey } = parseApiKey(authToken);

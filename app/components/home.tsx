@@ -10,6 +10,7 @@ import { ProductHomePage } from "./product-home";
 
 import { CombinedStatusPage } from "./combined-status";
 import { GrafanaPage } from "./grafana";
+import { UserManagementPage } from "./user-management";
 
 //import { MonitorPage } from "./monitor";
 
@@ -32,6 +33,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
@@ -171,6 +173,7 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const navigate = useNavigate();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -184,6 +187,25 @@ function Screen() {
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
+
+  // 检查用户是否已登录
+  useEffect(() => {
+    // 不需要登录的页面
+    const noAuthPages = [Path.Auth, "/artifacts"];
+    const isNoAuthPage = noAuthPages.some(page => location.pathname.includes(page));
+    
+    if (!isNoAuthPage) {
+      const userSession = localStorage.getItem("userSession");
+      if (!userSession) {
+        // 未登录，重定向到登录页面
+        navigate(Path.Auth);
+      } else {
+        // 已登录，更新accessStore中的用户会话
+        const parsedSession = JSON.parse(userSession);
+        useAccessStore.getState().login(parsedSession);
+      }
+    }
+  }, [location.pathname, navigate]);
 
   if (isArtifact) {
     return (
@@ -223,6 +245,7 @@ function Screen() {
             <Route path={Path.Grafana} element={<GrafanaPage />} />
             <Route path={Path.Inference} element={<Chat />} /> {/* 推理直接复用 Chat 组件 */}
             <Route path={Path.Showcase} element={<ShowcasePage />} />
+            <Route path={Path.UserManagement} element={<UserManagementPage />} />
           </Routes>
         </WindowContent>
       </>

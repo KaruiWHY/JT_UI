@@ -2,42 +2,17 @@ import styles from "./auth.module.scss";
 import { IconButton } from "./button";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Path, SAAS_CHAT_URL } from "../constant";
-import { useAccessStore } from "../store";
-import Locale from "../locales";
-import Delete from "../icons/close.svg";
-import Arrow from "../icons/arrow.svg";
-import Logo from "../icons/logo.svg";
-import { useMobileScreen } from "@/app/utils";
-import BotIcon from "../icons/bot.svg";
+import { Path } from "../constant";
 import { getClientConfig } from "../config/client";
 import { PasswordInput } from "./ui-lib";
-import LeftIcon from "@/app/icons/left.svg";
-import { safeLocalStorage } from "@/app/utils";
-import {
-  trackSettingsPageGuideToCPaymentClick,
-  trackAuthorizationPageButtonToCPaymentClick,
-} from "../utils/auth-settings-events";
-import clsx from "clsx";
-
-const storage = safeLocalStorage();
+import { LoginRequest } from "../types/auth";
 
 export function AuthPage() {
   const navigate = useNavigate();
-  const accessStore = useAccessStore();
-  const goHome = () => navigate(Path.Home);
-  const goChat = () => navigate(Path.Chat);
-  const goSaas = () => {
-    trackAuthorizationPageButtonToCPaymentClick();
-    window.location.href = SAAS_CHAT_URL;
-  };
-
-  const resetAccessCode = () => {
-    accessStore.update((access) => {
-      access.openaiApiKey = "";
-      access.accessCode = "";
-    });
-  }; // Reset access code to empty string
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (getClientConfig()?.isApp) {
@@ -46,144 +21,89 @@ export function AuthPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleLogin = async () => {
+    if (!username || !password) {
+      setError("请输入用户名和密码");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        } as LoginRequest),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // 存储登录信息到本地存储
+        localStorage.setItem("userSession", JSON.stringify({
+          token: data.token,
+          user: data.user
+        }));
+        navigate(Path.Chat);
+      } else {
+        setError(data.error || "登录失败");
+      }
+    } catch (err) {
+      setError("网络错误，请稍后重试");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles["auth-page"]}>
-      <TopBanner></TopBanner>
-      <div className={styles["auth-header"]}>
-        <IconButton
-          icon={<LeftIcon />}
-          text={Locale.Auth.Return}
-          onClick={() => navigate(Path.Home)}
-        ></IconButton>
-      </div>
-      <div className={clsx("no-dark", styles["auth-logo"])}>
-        <BotIcon />
+      <div className={styles["auth-logo"]}>
+        <img src="/big-ferrosemi-en&cn-blue.svg" alt="Logo" style={{ width: "100px", height: "100px" }} />
       </div>
 
-      <div className={styles["auth-title"]}>{Locale.Auth.Title}</div>
-      <div className={styles["auth-tips"]}>{Locale.Auth.Tips}</div>
+      <div className={styles["auth-title"]}>用户登录</div>
+      <div className={styles["auth-tips"]}>请输入您的用户名和密码</div>
+
+      {error && <div className={styles["auth-error"]}>{error}</div>}
 
       <PasswordInput
         style={{ marginTop: "3vh", marginBottom: "3vh" }}
-        aria={Locale.Settings.ShowPassword}
-        aria-label={Locale.Auth.Input}
-        value={accessStore.accessCode}
+        aria-label="用户名"
+        value={username}
         type="text"
-        placeholder={Locale.Auth.Input}
+        placeholder="用户名"
         onChange={(e) => {
-          accessStore.update(
-            (access) => (access.accessCode = e.currentTarget.value),
-          );
+          setUsername(e.currentTarget.value);
+          setError("");
         }}
       />
 
-      {!accessStore.hideUserApiKey ? (
-        <>
-          <div className={styles["auth-tips"]}>{Locale.Auth.SubTips}</div>
-          <PasswordInput
-            style={{ marginTop: "3vh", marginBottom: "3vh" }}
-            aria={Locale.Settings.ShowPassword}
-            aria-label={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
-            value={accessStore.openaiApiKey}
-            type="text"
-            placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
-            onChange={(e) => {
-              accessStore.update(
-                (access) => (access.openaiApiKey = e.currentTarget.value),
-              );
-            }}
-          />
-          <PasswordInput
-            style={{ marginTop: "3vh", marginBottom: "3vh" }}
-            aria={Locale.Settings.ShowPassword}
-            aria-label={Locale.Settings.Access.Google.ApiKey.Placeholder}
-            value={accessStore.googleApiKey}
-            type="text"
-            placeholder={Locale.Settings.Access.Google.ApiKey.Placeholder}
-            onChange={(e) => {
-              accessStore.update(
-                (access) => (access.googleApiKey = e.currentTarget.value),
-              );
-            }}
-          />
-        </>
-      ) : null}
+      <PasswordInput
+        style={{ marginTop: "3vh", marginBottom: "3vh" }}
+        aria-label="密码"
+        value={password}
+        type="password"
+        placeholder="密码"
+        onChange={(e) => {
+          setPassword(e.currentTarget.value);
+          setError("");
+        }}
+      />
 
       <div className={styles["auth-actions"]}>
         <IconButton
-          text={Locale.Auth.Confirm}
+          text={loading ? "登录中..." : "登录"}
           type="primary"
-          onClick={goChat}
-        />
-        <IconButton
-          text={Locale.Auth.SaasTips}
-          onClick={() => {
-            goSaas();
-          }}
+          onClick={handleLogin}
+          disabled={loading}
         />
       </div>
-    </div>
-  );
-}
-
-function TopBanner() {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const isMobile = useMobileScreen();
-  useEffect(() => {
-    // 检查 localStorage 中是否有标记
-    const bannerDismissed = storage.getItem("bannerDismissed");
-    // 如果标记不存在，存储默认值并显示横幅
-    if (!bannerDismissed) {
-      storage.setItem("bannerDismissed", "false");
-      setIsVisible(true); // 显示横幅
-    } else if (bannerDismissed === "true") {
-      // 如果标记为 "true"，则隐藏横幅
-      setIsVisible(false);
-    }
-  }, []);
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  const handleClose = () => {
-    setIsVisible(false);
-    storage.setItem("bannerDismissed", "true");
-  };
-
-  if (!isVisible) {
-    return null;
-  }
-  return (
-    <div
-      className={styles["top-banner"]}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className={clsx(styles["top-banner-inner"], "no-dark")}>
-        <Logo className={styles["top-banner-logo"]}></Logo>
-        <span>
-          {Locale.Auth.TopTips}
-          <a
-            href={SAAS_CHAT_URL}
-            rel="stylesheet"
-            onClick={() => {
-              trackSettingsPageGuideToCPaymentClick();
-            }}
-          >
-            {Locale.Settings.Access.SaasStart.ChatNow}
-            <Arrow style={{ marginLeft: "4px" }} />
-          </a>
-        </span>
-      </div>
-      {(isHovered || isMobile) && (
-        <Delete className={styles["top-banner-close"]} onClick={handleClose} />
-      )}
     </div>
   );
 }
