@@ -95,7 +95,7 @@ html {
 }
 
 body {
-  background-color: var(--gray);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
   color: var(--black);
   margin: 0;
   padding: 0;
@@ -109,7 +109,7 @@ body {
   overflow: hidden;
 
   @media only screen and (max-width: 600px) {
-    background-color: var(--second);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
   }
 
   *:focus-visible {

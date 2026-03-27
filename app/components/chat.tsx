@@ -21,9 +21,6 @@ import SpeakStopIcon from "../icons/speak-stop.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import LoadingButtonIcon from "../icons/loading.svg";
 import PromptIcon from "../icons/prompt.svg";
-import MaskIcon from "../icons/mask.svg";
-import MaxIcon from "../icons/max.svg";
-import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
 import ReloadIcon from "../icons/reload.svg";
 import BreakIcon from "../icons/break.svg";
@@ -40,7 +37,6 @@ import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
-import RobotIcon from "../icons/robot.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
@@ -509,6 +505,7 @@ export function ChatActions(props: {
   const chatStore = useChatStore();
   const pluginStore = usePluginStore();
   const session = chatStore.currentSession();
+  const accessStore = useAccessStore();
 
   // switch themes
   const theme = config.theme;
@@ -835,7 +832,7 @@ export function ChatActions(props: {
         {!isMobileScreen && <MCPAction />}
       </>
       <div className={styles["chat-input-actions-end"]}>
-        {config.realtimeConfig.enable && (
+        {config.realtimeConfig.enable && accessStore.isAdmin() && (
           <ChatAction
             onClick={() => props.setShowChatSidePanel(true)}
             text={"Realtime Chat"}
@@ -996,6 +993,32 @@ function _Chat() {
   const fontFamily = config.fontFamily;
 
   const [showExport, setShowExport] = useState(false);
+  const [modelName, setModelName] = useState<string>("");
+
+  // Fetch model name from metrics endpoint
+  useEffect(() => {
+    const fetchModelName = async () => {
+      try {
+        const response = await fetch("http://192.168.1.37:31000/metrics");
+        if (response.ok) {
+          const data = await response.text();
+          const modelMatch = data.match(
+            /model_name="\/mnt\/intel-ssd\/models\/([^"]+)"/,
+          );
+          if (modelMatch && modelMatch[1]) {
+            setModelName(modelMatch[1]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching model name:", error);
+      }
+    };
+
+    fetchModelName();
+    // Fetch model name every 30 seconds
+    const interval = setInterval(fetchModelName, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
@@ -1868,7 +1891,7 @@ function _Chat() {
                             </div>
                             {!isUser && (
                               <div className={styles["chat-model-name"]}>
-                                {message.model}
+                                {modelName || message.model}
                               </div>
                             )}
 

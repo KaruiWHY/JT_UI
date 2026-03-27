@@ -285,122 +285,128 @@ export function SideBar(props: { className?: string }) {
         </div>
       </SideBarHeader>
 
-      <SideBarBody
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            navigate(Path.Home);
-          }
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          overflow: "hidden",
         }}
       >
-        {/* --- 新增：演示功能长条按钮组 --- */}
-        <div
-          className={styles["sidebar-actions"]}
-          style={{
-            padding: "10px 20px",
-            gap: "8px",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <IconButton
-            icon={<DiscoveryIcon />}
-            text={shouldNarrow ? undefined : "产品主页"}
-            onClick={() => navigate(Path.ProductHome)}
-            className={styles["sidebar-bar-button"]}
-            shadow
-          />
-          {/* <IconButton
-            icon={<ChatGptIcon />}
-            text={shouldNarrow ? undefined : "模型状态"}
-            onClick={() => navigate(Path.ModelStatus)}
-            className={styles["sidebar-bar-button"]}
-            shadow
-          /> */}
-          <IconButton
-            icon={<McpIcon />}
-            text={shouldNarrow ? undefined : "推理服务"}
-            onClick={() => navigate(Path.Inference)}
-            className={styles["sidebar-bar-button"]}
-            shadow
-          />
-          {isAdmin && (
-            <>
-              <IconButton
-                icon={<AddIcon />}
-                text={shouldNarrow ? undefined : "模型监控"}
-                onClick={() => navigate(Path.Dashboard)}
-                className={styles["sidebar-bar-button"]}
-                shadow
-              />
-              <IconButton
-                icon={<DiscoveryIcon />}
-                text={shouldNarrow ? undefined : "实时指标"}
-                onClick={() => navigate(Path.Grafana)}
-                className={styles["sidebar-bar-button"]}
-                shadow
-              />
-              <IconButton
-                icon={<SettingsIcon />}
-                text={shouldNarrow ? undefined : "用户管理"}
-                onClick={() => navigate(Path.UserManagement)}
-                className={styles["sidebar-bar-button"]}
-                shadow
-              />
-            </>
-          )}
-          <IconButton
-            icon={<McpIcon />}
-            text={shouldNarrow ? undefined : "Openclaw"}
-            onClick={openOpenclaw}
-            className={styles["sidebar-bar-button"]}
-            shadow
-          />
-          <IconButton
-            icon={<DragIcon />}
-            text={shouldNarrow ? undefined : "样机展示"}
-            onClick={() => navigate(Path.Showcase)}
-            className={styles["sidebar-bar-button"]}
-            shadow
+        {/* 固定导航项 */}
+        <div className={styles["sidebar-nav"]}>
+          {/* --- 新增：演示功能长条按钮组 --- */}
+          <div
+            className={styles["sidebar-actions"]}
+            style={{
+              padding: "10px 20px",
+              gap: "8px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <IconButton
+              icon={<DiscoveryIcon />}
+              text={shouldNarrow ? undefined : "产品主页"}
+              onClick={() => navigate(Path.ProductHome)}
+              className={styles["sidebar-bar-button"]}
+              shadow
+            />
+            {/* <IconButton
+              icon={<ChatGptIcon />}
+              text={shouldNarrow ? undefined : "模型状态"}
+              onClick={() => navigate(Path.ModelStatus)}
+              className={styles["sidebar-bar-button"]}
+              shadow
+            /> */}
+            <IconButton
+              icon={<McpIcon />}
+              text={shouldNarrow ? undefined : "推理服务"}
+              onClick={() => navigate(Path.Inference)}
+              className={styles["sidebar-bar-button"]}
+              shadow
+            />
+            {isAdmin && (
+              <>
+                <IconButton
+                  icon={<AddIcon />}
+                  text={shouldNarrow ? undefined : "模型监控"}
+                  onClick={() => navigate(Path.Dashboard)}
+                  className={styles["sidebar-bar-button"]}
+                  shadow
+                />
+                <IconButton
+                  icon={<DiscoveryIcon />}
+                  text={shouldNarrow ? undefined : "实时指标"}
+                  onClick={() => navigate(Path.Grafana)}
+                  className={styles["sidebar-bar-button"]}
+                  shadow
+                />
+                <IconButton
+                  icon={<SettingsIcon />}
+                  text={shouldNarrow ? undefined : "用户管理"}
+                  onClick={() => navigate(Path.UserManagement)}
+                  className={styles["sidebar-bar-button"]}
+                  shadow
+                />
+              </>
+            )}
+            <IconButton
+              icon={<McpIcon />}
+              text={shouldNarrow ? undefined : "Openclaw"}
+              onClick={openOpenclaw}
+              className={styles["sidebar-bar-button"]}
+              shadow
+            />
+            <IconButton
+              icon={<DragIcon />}
+              text={shouldNarrow ? undefined : "样机展示"}
+              onClick={() => navigate(Path.Showcase)}
+              className={styles["sidebar-bar-button"]}
+              shadow
+            />
+          </div>
+
+          {/* 分割线 */}
+          <div
+            style={{
+              height: "1px",
+              background: "var(--border-in-light)",
+              margin: "10px 20px",
+              opacity: 0.5,
+            }}
           />
         </div>
 
-        {/* 分割线 */}
-        <div
-          style={{
-            height: "1px",
-            background: "var(--border-in-light)",
-            margin: "10px 20px",
-            opacity: 0.5,
-          }}
-        />
+        {/* 可滚动聊天列表 */}
+        <div style={{ flex: 1, overflow: "auto" }}>
+          <SideBarBody
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                navigate(Path.Home);
+              }
+            }}
+          >
+            {/* 聊天列表区 */}
+            <ChatList narrow={shouldNarrow} />
+          </SideBarBody>
+        </div>
+      </div>
 
-        {/* 聊天列表区 */}
-        <ChatList narrow={shouldNarrow} />
-      </SideBarBody>
-
-      <SideBarTail
-        primaryAction={
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', padding: '0 10px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-color-secondary)', textAlign: 'center' }}>
-              {accessStore.userSession?.user?.username}
-              <br />
-              <span style={{ fontSize: '10px' }}>
-                {accessStore.userSession?.user?.role === 'admin' ? '管理员' : '普通用户'}
-              </span>
-            </div>
-            <IconButton
-              icon={<SettingsIcon />}
-              text={shouldNarrow ? undefined : "登出"}
-              onClick={() => {
-                accessStore.logout();
-                navigate(Path.Auth);
-              }}
-              shadow
-              style={{ width: '100%' }}
-            />
-          </div>
-        }
-        secondaryAction={
+      {/* 自定义底部布局，不使用SideBarTail */}
+      <div
+        style={{
+          paddingTop: "20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          padding: "20px 10px 10px 10px",
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* 新建对话按钮 - 独占一行，居中，宽度增加，高度增加，文字加大加粗 */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <IconButton
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : "新建对话"}
@@ -409,9 +415,75 @@ export function SideBar(props: { className?: string }) {
               navigate(Path.Chat);
             }}
             shadow
+            style={{
+              width: "80%",
+              height: "48px",
+              fontSize: "16px",
+              fontWeight: "600",
+            }}
           />
-        }
-      />
+        </div>
+
+        {/* 用户信息和登出按钮 - 同一行左右排布，固定宽度 */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          {/* 用户信息框 - 固定宽度，居中显示 */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: "10px",
+              padding: "10px 15px",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+              width: "calc(100% - 90px)", // 总宽度减去登出按钮宽度和间距
+              marginRight: "10px",
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                fontSize: "14px",
+                fontWeight: "500",
+                color: "var(--text-color-primary)",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                textAlign: "center",
+              }}
+            >
+              {accessStore.userSession?.user?.username}
+              {accessStore.userSession?.user?.role === "admin" && (
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: "var(--primary)",
+                    marginLeft: "4px",
+                  }}
+                >
+                  管理员
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* 登出按钮 - 靠右对齐，固定宽度 */}
+          <IconButton
+            icon={<SettingsIcon />}
+            text={shouldNarrow ? undefined : "登出"}
+            onClick={() => {
+              accessStore.logout();
+              navigate(Path.Auth);
+            }}
+            shadow
+            style={{ width: "80px", flexShrink: 0 }}
+          />
+        </div>
+      </div>
     </SideBarContainer>
   );
 }

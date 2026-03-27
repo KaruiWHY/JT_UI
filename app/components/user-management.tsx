@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import styles from './user-management.module.scss';
-import { IconButton } from './button';
-import { PasswordInput } from './ui-lib';
+import React, { useState, useEffect } from "react";
+import styles from "./user-management.module.scss";
+import { IconButton } from "./button";
 
 interface User {
   id: string;
   username: string;
   password: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   createdAt: Date;
   updatedAt: Date;
   createdBy?: string;
@@ -16,29 +15,29 @@ interface User {
 export function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [newUser, setNewUser] = useState({
-    username: '',
-    password: '',
-    role: 'user' as 'admin' | 'user'
+    username: "",
+    password: "",
+    role: "user" as "admin" | "user",
   });
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      setError('');
-      const response = await fetch('/api/login', {
-        method: 'GET'
+      setError("");
+      const response = await fetch("/api/login", {
+        method: "GET",
       });
       const data = await response.json();
       if (data.success) {
         setUsers(data.users);
       } else {
-        setError(data.error || '获取用户列表失败');
+        setError(data.error || "获取用户列表失败");
       }
     } catch (err) {
-      setError('网络错误，请稍后重试');
+      setError("网络错误，请稍后重试");
     } finally {
       setLoading(false);
     }
@@ -46,54 +45,54 @@ export function UserManagementPage() {
 
   const handleAddUser = async () => {
     if (!newUser.username || !newUser.password) {
-      setError('请输入用户名和密码');
+      setError("请输入用户名和密码");
       return;
     }
 
     try {
       setLoading(true);
-      setError('');
-      const userSession = localStorage.getItem('userSession');
+      setError("");
+      const userSession = localStorage.getItem("userSession");
       const token = userSession ? JSON.parse(userSession).token : null;
-      const response = await fetch('/api/login', {
-        method: 'PUT',
+      const response = await fetch("/api/login", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` })
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(newUser)
+        body: JSON.stringify(newUser),
       });
       const data = await response.json();
       if (data.success) {
         setShowAddForm(false);
-        setNewUser({ username: '', password: '', role: 'user' });
+        setNewUser({ username: "", password: "", role: "user" });
         fetchUsers();
       } else {
-        setError(data.error || '添加用户失败');
+        setError(data.error || "添加用户失败");
       }
     } catch (err) {
-      setError('网络错误，请稍后重试');
+      setError("网络错误，请稍后重试");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (window.confirm('确定要删除这个用户吗？')) {
+    if (window.confirm("确定要删除这个用户吗？")) {
       try {
         setLoading(true);
-        setError('');
+        setError("");
         const response = await fetch(`/api/login?id=${userId}`, {
-          method: 'DELETE'
+          method: "DELETE",
         });
         const data = await response.json();
         if (data.success) {
           fetchUsers();
         } else {
-          setError(data.error || '删除用户失败');
+          setError(data.error || "删除用户失败");
         }
       } catch (err) {
-        setError('网络错误，请稍后重试');
+        setError("网络错误，请稍后重试");
       } finally {
         setLoading(false);
       }
@@ -105,12 +104,12 @@ export function UserManagementPage() {
   }, []);
 
   return (
-    <div className={styles['user-management']}>
+    <div className={styles["user-management"]}>
       <h2>用户管理</h2>
-      
-      {error && <div className={styles['error']}>{error}</div>}
 
-      <div className={styles['actions']}>
+      {error && <div className={styles["error"]}>{error}</div>}
+
+      <div className={styles["actions"]}>
         <IconButton
           text="添加用户"
           type="primary"
@@ -119,17 +118,25 @@ export function UserManagementPage() {
       </div>
 
       {showAddForm && (
-        <div className={styles['add-form']}>
+        <div className={styles["add-form"]}>
           <h3>添加新用户</h3>
           <input
             type="text"
             value={newUser.username}
             placeholder="用户名"
-            onChange={(e) => setNewUser({ ...newUser, username: e.currentTarget.value.replace(/[^a-zA-Z0-9]/g, '') })}
-            style={{ marginBottom: '10px', padding: '8px', width: '100%', display: 'block' }}
+            onChange={(e) =>
+              setNewUser({
+                ...newUser,
+                username: e.currentTarget.value.replace(/[^a-zA-Z0-9]/g, ""),
+              })
+            }
             onKeyPress={(e) => {
               // 只允许输入英文和数字
-              if (!/[a-zA-Z0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+              if (
+                !/[a-zA-Z0-9]/.test(e.key) &&
+                e.key !== "Backspace" &&
+                e.key !== "Delete"
+              ) {
                 e.preventDefault();
               }
             }}
@@ -138,31 +145,44 @@ export function UserManagementPage() {
             type="text"
             value={newUser.password}
             placeholder="密码"
-            onChange={(e) => setNewUser({ ...newUser, password: e.currentTarget.value.replace(/[^a-zA-Z0-9]/g, '') })}
-            style={{ marginBottom: '10px', padding: '8px', width: '100%', display: 'block' }}
+            onChange={(e) =>
+              setNewUser({
+                ...newUser,
+                password: e.currentTarget.value.replace(/[^a-zA-Z0-9]/g, ""),
+              })
+            }
             onKeyPress={(e) => {
               // 只允许输入英文和数字
-              if (!/[a-zA-Z0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+              if (
+                !/[a-zA-Z0-9]/.test(e.key) &&
+                e.key !== "Backspace" &&
+                e.key !== "Delete"
+              ) {
                 e.preventDefault();
               }
             }}
           />
-          <div className={styles['role-select']}>
+          <div className={styles["role-select"]}>
             <label>角色：</label>
             <select
               value={newUser.role}
-              onChange={(e) => setNewUser({ ...newUser, role: e.target.value as 'admin' | 'user' })}
+              onChange={(e) =>
+                setNewUser({
+                  ...newUser,
+                  role: e.target.value as "admin" | "user",
+                })
+              }
             >
               <option value="user">普通用户</option>
               <option value="admin">管理员</option>
             </select>
           </div>
-          <div className={styles['form-actions']}>
+          <div className={styles["form-actions"]}>
             <IconButton
               text="取消"
               onClick={() => {
                 setShowAddForm(false);
-                setNewUser({ username: '', password: '', role: 'user' });
+                setNewUser({ username: "", password: "", role: "user" });
               }}
             />
             <IconButton
@@ -175,7 +195,7 @@ export function UserManagementPage() {
         </div>
       )}
 
-      <div className={styles['user-list']}>
+      <div className={styles["user-list"]}>
         <table>
           <thead>
             <tr>
@@ -193,10 +213,14 @@ export function UserManagementPage() {
                 <td>{user.id}</td>
                 <td>{user.username}</td>
                 <td>{user.password}</td>
-                <td>{user.role === 'admin' ? '管理员' : '普通用户'}</td>
-                <td>{user.createdBy || '系统'}</td>
                 <td>
-                  {user.id !== '1' && (
+                  <span className={user.role === "admin" ? "admin" : "user"}>
+                    {user.role === "admin" ? "管理员" : "普通用户"}
+                  </span>
+                </td>
+                <td>{user.createdBy || "系统"}</td>
+                <td>
+                  {user.id !== "1" && (
                     <IconButton
                       text="删除"
                       type="danger"
