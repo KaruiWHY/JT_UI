@@ -66,50 +66,62 @@ export function AuthPage() {
 
   return (
     <div className={styles["auth-page"]}>
-      <div className={styles["auth-logo"]}>
-        <img
-          src="/big-ferrosemi-en&cn-blue.svg"
-          alt="Logo"
-          style={{ width: "100px", height: "100px" }}
-        />
-      </div>
+      <div className={styles["auth-container"]}>
+        <div className={styles["auth-logo"]}>
+          <img
+            src="/big-ferrosemi-en&cn-blue.svg"
+            alt="Logo"
+            style={{ width: "100px", height: "100px" }}
+          />
+        </div>
 
-      <div className={styles["auth-title"]}>用户登录</div>
-      <div className={styles["auth-tips"]}>请输入您的用户名和密码</div>
+        <div className={styles["auth-title"]}>用户登录</div>
+        <div className={styles["auth-tips"]}>请输入您的用户名和密码</div>
 
-      {error && <div className={styles["auth-error"]}>{error}</div>}
+        {error && <div className={styles["auth-error"]}>{error}</div>}
 
-      <Input
-        style={{ marginTop: "3vh", marginBottom: "3vh" }}
-        aria-label="用户名"
-        value={username}
-        type="text"
-        placeholder="用户名"
-        onChange={(e) => {
-          setUsername(e.currentTarget.value);
-          setError("");
-        }}
-      />
+        <div className={styles["auth-input-group"]}>
+          <label htmlFor="username">用户名</label>
+          <Input
+            id="username"
+            aria-label="用户名"
+            value={username}
+            placeholder="请输入用户名"
+            onChange={(e) => {
+              setUsername(e.currentTarget.value);
+              setError("");
+            }}
+          />
+        </div>
 
-      <PasswordInput
-        style={{ marginTop: "3vh", marginBottom: "3vh" }}
-        aria-label="密码"
-        value={password}
-        type="password"
-        placeholder="密码"
-        onChange={(e) => {
-          setPassword(e.currentTarget.value);
-          setError("");
-        }}
-      />
+        <div className={styles["auth-input-group"]}>
+          <label htmlFor="password">密码</label>
+          <PasswordInput
+            id="password"
+            aria-label="密码"
+            value={password}
+            type="password"
+            placeholder="请输入密码"
+            onChange={(e) => {
+              setPassword(e.currentTarget.value);
+              setError("");
+            }}
+          />
+        </div>
 
-      <div className={styles["auth-actions"]}>
-        <IconButton
-          text={loading ? "登录中..." : "登录"}
-          type="primary"
-          onClick={handleLogin}
-          disabled={loading}
-        />
+        <div className={styles["auth-actions"]}>
+          <IconButton
+            text={loading ? "登录中..." : "登录"}
+            type="primary"
+            onClick={handleLogin}
+            disabled={loading}
+          />
+        </div>
+
+        <div className={styles["auth-footer"]}>
+          <p>© 2026 晶铁半导体</p>
+          <p>保留所有权利</p>
+        </div>
       </div>
     </div>
   );

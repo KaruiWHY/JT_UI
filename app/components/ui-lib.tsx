@@ -255,17 +255,16 @@ export function showToast(
   root.render(<Toast content={content} action={action} onClose={close} />);
 }
 
-export type InputProps = React.HTMLProps<HTMLTextAreaElement> & {
+export type InputProps = React.HTMLProps<HTMLInputElement> & {
   autoHeight?: boolean;
   rows?: number;
 };
 
 export function Input(props: InputProps) {
   return (
-    <textarea
-      {...props}
-      className={clsx(styles["input"], props.className)}
-    ></textarea>
+    <div className={"password-input-container"}>
+      <input {...props} type="text" className={"password-input"} />
+    </div>
   );
 }
 
