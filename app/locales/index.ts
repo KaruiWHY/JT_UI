@@ -137,13 +137,13 @@ export function getLang(): Lang {
 
 const fallbackLang = en;
 const lang = getLang();
-console.log("[Locales] Selected language:", lang);
+//console.log("[Locales] Selected language:", lang);
 const targetLang = ALL_LANGS[lang] as LocaleType;
-console.log("[Locales] Target language object:", targetLang);
+//console.log("[Locales] Target language object:", targetLang);
 
 // if target lang missing some fields, it will use fallback lang string
 merge(fallbackLang, targetLang);
-console.log("[Locales] Final merged language object:", fallbackLang);
+//console.log("[Locales] Final merged language object:", fallbackLang);
 
 export default fallbackLang as LocaleType;
 

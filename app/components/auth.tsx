@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { getClientConfig } from "../config/client";
-import { PasswordInput } from "./ui-lib";
+import { PasswordInput, Input } from "./ui-lib";
 import { LoginRequest } from "../types/auth";
 
 export function AuthPage() {
@@ -46,10 +46,13 @@ export function AuthPage() {
 
       if (data.success) {
         // 存储登录信息到本地存储
-        localStorage.setItem("userSession", JSON.stringify({
-          token: data.token,
-          user: data.user
-        }));
+        localStorage.setItem(
+          "userSession",
+          JSON.stringify({
+            token: data.token,
+            user: data.user,
+          }),
+        );
         navigate(Path.Chat);
       } else {
         setError(data.error || "登录失败");
@@ -64,7 +67,11 @@ export function AuthPage() {
   return (
     <div className={styles["auth-page"]}>
       <div className={styles["auth-logo"]}>
-        <img src="/big-ferrosemi-en&cn-blue.svg" alt="Logo" style={{ width: "100px", height: "100px" }} />
+        <img
+          src="/big-ferrosemi-en&cn-blue.svg"
+          alt="Logo"
+          style={{ width: "100px", height: "100px" }}
+        />
       </div>
 
       <div className={styles["auth-title"]}>用户登录</div>
@@ -72,7 +79,7 @@ export function AuthPage() {
 
       {error && <div className={styles["auth-error"]}>{error}</div>}
 
-      <PasswordInput
+      <Input
         style={{ marginTop: "3vh", marginBottom: "3vh" }}
         aria-label="用户名"
         value={username}
