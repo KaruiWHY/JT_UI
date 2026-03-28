@@ -7,47 +7,73 @@
   flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   
   .auth-container {
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    padding: 50px;
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
     text-align: center;
     animation: slide-in ease 0.5s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #8b5cf6, #ec4899);
   }
 
   .auth-logo {
-    margin-bottom: 30px;
-    transform: scale(1.2);
+    margin-bottom: 35px;
+    transform: scale(1.3);
   }
 
   .auth-title {
-    font-size: 28px;
-    font-weight: bold;
-    line-height: 1.5;
-    margin-bottom: 10px;
-    color: #333;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    color: #1e293b;
   }
 
   .auth-tips {
     font-size: 16px;
-    color: #666;
-    margin-bottom: 30px;
+    color: #64748b;
+    margin-bottom: 35px;
   }
 
   .auth-input-group {
-    margin-bottom: 20px;
-    text-align: left;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: right; /* 整个模块绝对居中 */
     
     label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
+      display: inline-block;
+      width: 60px; /* 锁死文字宽度，刚好装下三个字 */
+      text-align-last: justify; /* 强制“用户名”和“密码”两端完全平齐 */
+      text-align: justify;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-right: 20px; /* 锁死：这就是文字和输入框之间永远不变的间距 */
+      flex-shrink: 0;
+    }
+
+    /* 核心杀手锏：统一外壳，强制尺寸 */
+    > *:not(label) {
+      width: 260px !important; /* 强制设定相同的死宽度 */
+      flex: none !important; /* 取消了注释：彻底废除底层自带的 flex 干扰 */
+      margin: 0 !important;  /* 取消了注释：防止任何多余外边距干扰 */
     }
   }
 
@@ -55,48 +81,99 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-    margin-top: 30px;
+    margin-top: 35px;
 
     button {
       width: 100%;
-      height: 48px;
-      border-radius: 12px;
+      height: 52px;
+      border-radius: 14px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       transition: all 0.3s ease;
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      border: none;
       
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
       }
     }
 
     button:not(:last-child) {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
   }
 
   .auth-error {
-    background-color: rgba(255, 0, 0, 0.1);
-    color: #ff4757;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 20px 0;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    padding: 14px;
+    border-radius: 10px;
+    margin: 24px 0;
     text-align: center;
     font-size: 14px;
     animation: fade-in ease 0.3s;
   }
 
   .auth-footer {
-    margin-top: 30px;
+    margin-top: 35px;
     text-align: center;
     font-size: 14px;
-    color: #999;
+    color: #94a3b8;
 
     p {
-      margin: 5px 0;
+      margin: 6px 0;
     }
   }
+
+  /* 通用带眼睛输入框容器样式 */
+  .password-input-container {
+    width: 100%; /* 删除了原来的 flex: 1，改用 100% 完全继承父级的 260px */
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* 输入框本体样式 */
+  .password-input {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box; /* 极其重要：确保 padding 不会额外撑大输入框的总体积 */
+    transition: all 0.3s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+  }
+
+  /* 眼睛图标样式 */
+  .password-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* 专门针对用户名行：暴力隐藏里面的按钮 (眼睛)，保留物理占位 */
+  .hide-eye-group {
+    button {
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+  }
+
 }
 
 @keyframes slide-in {

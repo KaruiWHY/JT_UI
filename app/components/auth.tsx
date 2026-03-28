@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { getClientConfig } from "../config/client";
-import { PasswordInput, Input } from "./ui-lib";
+import { PasswordInput } from "./ui-lib";
 import { LoginRequest } from "../types/auth";
 
 export function AuthPage() {
@@ -80,33 +80,41 @@ export function AuthPage() {
 
         {error && <div className={styles["auth-error"]}>{error}</div>}
 
-        <div className={styles["auth-input-group"]}>
+        {/* --- 第一行：用户名 (占位隐藏眼睛) --- */}
+        <div
+          className={`${styles["auth-input-group"]} ${styles["hide-eye-group"]}`}
+        >
           <label htmlFor="username">用户名</label>
-          <Input
-            id="username"
-            aria-label="用户名"
-            value={username}
-            placeholder="请输入用户名"
-            onChange={(e) => {
-              setUsername(e.currentTarget.value);
-              setError("");
-            }}
-          />
+          <div className={styles["input-wrapper"]}>
+            <PasswordInput
+              id="username"
+              aria-label="用户名"
+              value={username}
+              placeholder="请输入用户名"
+              onChange={(e) => {
+                setUsername(e.currentTarget.value);
+                setError("");
+              }}
+            />
+          </div>
         </div>
 
+        {/* --- 第二行：密码 --- */}
         <div className={styles["auth-input-group"]}>
           <label htmlFor="password">密码</label>
-          <PasswordInput
-            id="password"
-            aria-label="密码"
-            value={password}
-            type="password"
-            placeholder="请输入密码"
-            onChange={(e) => {
-              setPassword(e.currentTarget.value);
-              setError("");
-            }}
-          />
+          <div className={styles["input-wrapper"]}>
+            <PasswordInput
+              id="password"
+              aria-label="密码"
+              value={password}
+              type="password"
+              placeholder="请输入密码"
+              onChange={(e) => {
+                setPassword(e.currentTarget.value);
+                setError("");
+              }}
+            />
+          </div>
         </div>
 
         <div className={styles["auth-actions"]}>

@@ -278,16 +278,16 @@ export function PasswordInput(
 
   return (
     <div className={"password-input-container"}>
+      <input
+        {...props}
+        type={visible ? "text" : "password"}
+        className={"password-input"}
+      />
       <IconButton
         aria={props.aria}
         icon={visible ? <EyeIcon /> : <EyeOffIcon />}
         onClick={changeVisibility}
         className={"password-eye"}
-      />
-      <input
-        {...props}
-        type={visible ? "text" : "password"}
-        className={"password-input"}
       />
     </div>
   );
