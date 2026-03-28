@@ -1,6 +1,7 @@
 "use client";
 
-const GRAFANA_URL = "http://192.168.1.37:4000/";
+const GRAFANA_URL = "http://192.168.1.37:4000/?orgId=1&kiosk=true";
+//const GRAFANA_URL = "http://192.168.1.37:4000/";
 
 export function GrafanaPage() {
   return (
