@@ -43,6 +43,11 @@ import { type ClientApi, getClientApi } from "../client/api";
 import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
+import { IconButton } from "./button";
+import DiscoveryIcon from "../icons/discovery.svg";
+import McpIcon from "../icons/mcp.svg";
+import AddIcon from "../icons/add.svg";
+import DragIcon from "../icons/drag.svg";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -192,8 +197,10 @@ function Screen() {
   useEffect(() => {
     // 不需要登录的页面
     const noAuthPages = [Path.Auth, "/artifacts"];
-    const isNoAuthPage = noAuthPages.some(page => location.pathname.includes(page));
-    
+    const isNoAuthPage = noAuthPages.some((page) =>
+      location.pathname.includes(page),
+    );
+
     if (!isNoAuthPage) {
       const userSession = localStorage.getItem("userSession");
       if (!userSession) {
@@ -215,17 +222,92 @@ function Screen() {
     );
   }
 
+  // 顶部导航栏组件
+  const TopNavigation = () => {
+    const navigate = useNavigate();
+    const config = useAppConfig();
+    const accessStore = useAccessStore();
+
+    const DEFAULT_OPENCLAW_URL = "http://localhost:18789/openclaw/";
+
+    function normalizeOpenclawUrl(url: string) {
+      const trimmed = url.trim();
+      if (!trimmed) return DEFAULT_OPENCLAW_URL;
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return `http://${trimmed}`;
+    }
+
+    return (
+      <div className={styles["top-nav"]}>
+        <div className={styles["top-nav-buttons"]}>
+          <IconButton
+            icon={<DiscoveryIcon />}
+            text="产品主页"
+            onClick={() => navigate(Path.ProductHome)}
+            className={styles["top-nav-button"]}
+          />
+          <IconButton
+            icon={<McpIcon />}
+            text="推理服务"
+            onClick={() => navigate(Path.Inference)}
+            className={styles["top-nav-button"]}
+          />
+          {accessStore.isAdmin() && (
+            <>
+              <IconButton
+                icon={<AddIcon />}
+                text="模型监控"
+                onClick={() => navigate(Path.Dashboard)}
+                className={styles["top-nav-button"]}
+              />
+              <IconButton
+                icon={<DiscoveryIcon />}
+                text="实时指标"
+                onClick={() => navigate(Path.Grafana)}
+                className={styles["top-nav-button"]}
+              />
+              <IconButton
+                icon={<McpIcon />}
+                text="用户管理"
+                onClick={() => navigate(Path.UserManagement)}
+                className={styles["top-nav-button"]}
+              />
+            </>
+          )}
+          <IconButton
+            icon={<McpIcon />}
+            text="Openclaw"
+            onClick={() => {
+              const targetUrl = normalizeOpenclawUrl(
+                config.openclawConfig?.url ?? DEFAULT_OPENCLAW_URL,
+              );
+              window.open(targetUrl, "_blank", "noopener,noreferrer");
+            }}
+            className={styles["top-nav-button"]}
+          />
+          <IconButton
+            icon={<DragIcon />}
+            text="样机展示"
+            onClick={() => navigate(Path.Showcase)}
+            className={styles["top-nav-button"]}
+          />
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
     if (isAuth) return <AuthPage />;
-    if (isSd) return <Sd />;
-    if (isSdNew) return <Sd />;
     return (
       <>
-        <SideBar
-          className={clsx({
-            [styles["sidebar-show"]]: isHome,
-          })}
-        />
+        <TopNavigation />
+        {!isSd && !isSdNew && (
+          <SideBar
+            className={clsx({
+              [styles["sidebar-show"]]: isHome,
+            })}
+          />
+        )}
         <WindowContent>
           <Routes>
             <Route path={Path.Home} element={<Chat />} />
@@ -236,16 +318,21 @@ function Screen() {
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
-
+            <Route path={Path.Sd} element={<Sd />} />
+            <Route path={Path.SdNew} element={<Sd />} />
             {/* --- 新增演示流程路由 --- */}
             {/* <Route path={Path.Monitor} element={<MonitorPage />} /> */}
             <Route path={Path.ProductHome} element={<ProductHomePage />} />
             {/* <Route path={Path.ModelStatus} element={<ModelStatusPage />} /> */}
             <Route path={Path.Dashboard} element={<CombinedStatusPage />} />
             <Route path={Path.Grafana} element={<GrafanaPage />} />
-            <Route path={Path.Inference} element={<Chat />} /> {/* 推理直接复用 Chat 组件 */}
+            <Route path={Path.Inference} element={<Chat />} />{" "}
+            {/* 推理直接复用 Chat 组件 */}
             <Route path={Path.Showcase} element={<ShowcasePage />} />
-            <Route path={Path.UserManagement} element={<UserManagementPage />} />
+            <Route
+              path={Path.UserManagement}
+              element={<UserManagementPage />}
+            />
           </Routes>
         </WindowContent>
       </>

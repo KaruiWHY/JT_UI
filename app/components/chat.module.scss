@@ -551,13 +551,13 @@
 }
 
 .chat-message-user > .chat-message-container > .chat-message-item {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-  color: white;
-  border: none;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  color: #1e40af;
+  border: 1px solid #a5b4fc;
 
   &:hover {
     min-width: 0;
-    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
   }
 }
 
@@ -791,3 +791,5 @@
     }
   }
 }
+
+

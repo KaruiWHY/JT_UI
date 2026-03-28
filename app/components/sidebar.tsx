@@ -6,9 +6,7 @@ import { IconButton } from "./button";
 import SettingsIcon from "../icons/settings.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
-import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
-import DiscoveryIcon from "../icons/discovery.svg";
 
 import Locale from "../locales";
 
@@ -262,7 +260,7 @@ export function SideBar(props: { className?: string }) {
     >
       <SideBarHeader
         title="普惠 AI 一体机"
-        subTitle="控制系统"
+        subTitle="您的本地私有化智能助手"
         logo={<ChatGptIcon />}
         shouldNarrow={shouldNarrow}
       >
@@ -293,91 +291,6 @@ export function SideBar(props: { className?: string }) {
           overflow: "hidden",
         }}
       >
-        {/* 固定导航项 */}
-        <div className={styles["sidebar-nav"]}>
-          {/* --- 新增：演示功能长条按钮组 --- */}
-          <div
-            className={styles["sidebar-actions"]}
-            style={{
-              padding: "10px 20px",
-              gap: "8px",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <IconButton
-              icon={<DiscoveryIcon />}
-              text={shouldNarrow ? undefined : "产品主页"}
-              onClick={() => navigate(Path.ProductHome)}
-              className={styles["sidebar-bar-button"]}
-              shadow
-            />
-            {/* <IconButton
-              icon={<ChatGptIcon />}
-              text={shouldNarrow ? undefined : "模型状态"}
-              onClick={() => navigate(Path.ModelStatus)}
-              className={styles["sidebar-bar-button"]}
-              shadow
-            /> */}
-            <IconButton
-              icon={<McpIcon />}
-              text={shouldNarrow ? undefined : "推理服务"}
-              onClick={() => navigate(Path.Inference)}
-              className={styles["sidebar-bar-button"]}
-              shadow
-            />
-            {isAdmin && (
-              <>
-                <IconButton
-                  icon={<AddIcon />}
-                  text={shouldNarrow ? undefined : "模型监控"}
-                  onClick={() => navigate(Path.Dashboard)}
-                  className={styles["sidebar-bar-button"]}
-                  shadow
-                />
-                <IconButton
-                  icon={<DiscoveryIcon />}
-                  text={shouldNarrow ? undefined : "实时指标"}
-                  onClick={() => navigate(Path.Grafana)}
-                  className={styles["sidebar-bar-button"]}
-                  shadow
-                />
-                <IconButton
-                  icon={<SettingsIcon />}
-                  text={shouldNarrow ? undefined : "用户管理"}
-                  onClick={() => navigate(Path.UserManagement)}
-                  className={styles["sidebar-bar-button"]}
-                  shadow
-                />
-              </>
-            )}
-            <IconButton
-              icon={<McpIcon />}
-              text={shouldNarrow ? undefined : "Openclaw"}
-              onClick={openOpenclaw}
-              className={styles["sidebar-bar-button"]}
-              shadow
-            />
-            <IconButton
-              icon={<DragIcon />}
-              text={shouldNarrow ? undefined : "样机展示"}
-              onClick={() => navigate(Path.Showcase)}
-              className={styles["sidebar-bar-button"]}
-              shadow
-            />
-          </div>
-
-          {/* 分割线 */}
-          <div
-            style={{
-              height: "1px",
-              background: "var(--border-in-light)",
-              margin: "10px 20px",
-              opacity: 0.5,
-            }}
-          />
-        </div>
-
         {/* 可滚动聊天列表 */}
         <div style={{ flex: 1, overflow: "auto" }}>
           <SideBarBody
@@ -410,6 +323,7 @@ export function SideBar(props: { className?: string }) {
           <IconButton
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : "新建对话"}
+            className={styles["sidebar-new-chat-btn"]}
             onClick={() => {
               chatStore.newSession();
               navigate(Path.Chat);
@@ -417,9 +331,11 @@ export function SideBar(props: { className?: string }) {
             shadow
             style={{
               width: "80%",
-              height: "48px",
-              fontSize: "16px",
-              fontWeight: "600",
+              height: "52px",
+              // fontSize: "20px",
+              // fontWeight: "600",
+              // backgroundColor: "#4f46e5", // 【新增】你的品牌主题蓝色
+              // color: "white", // 【新增】文字和图标变成白色
             }}
           />
         </div>
