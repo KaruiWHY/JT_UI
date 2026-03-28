@@ -279,8 +279,8 @@ export function PasswordInput(
   return (
     <div className={"password-input-container"}>
       <input
-        {...props}
         type={visible ? "text" : "password"}
+        {...props}
         className={"password-input"}
       />
       <IconButton

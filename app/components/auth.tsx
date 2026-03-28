@@ -80,7 +80,7 @@ export function AuthPage() {
 
         {error && <div className={styles["auth-error"]}>{error}</div>}
 
-        {/* --- 第一行：用户名 (占位隐藏眼睛) --- */}
+        {/* --- 第一行：用户名 (使用密码框组件，但强制设为明文) --- */}
         <div
           className={`${styles["auth-input-group"]} ${styles["hide-eye-group"]}`}
         >
@@ -89,6 +89,7 @@ export function AuthPage() {
             <PasswordInput
               id="username"
               aria-label="用户名"
+              type="text" /* 【核心新增】：强制告诉底层组件，我这里要显示普通文本 */
               value={username}
               placeholder="请输入用户名"
               onChange={(e) => {
